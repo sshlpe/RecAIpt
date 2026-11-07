@@ -1,4 +1,9 @@
-import { GoogleGenAI, ThinkingLevel, createPartFromBase64 } from "@google/genai";
+import {
+  GoogleGenAI,
+  PartMediaResolutionLevel,
+  ThinkingLevel,
+  createPartFromBase64,
+} from "@google/genai";
 import { z } from "zod";
 import { receiptSchema } from "@/lib/receipt/receipt-schema";
 import { EXTRACTION_SYSTEM_PROMPT, EXTRACTION_USER_PROMPT } from "../extraction-prompt";
@@ -18,6 +23,13 @@ export const DEFAULT_GEMINI_MODEL = "gemini-3.5-flash";
  * LOW deja algo de margen para boletas manuscritas.
  */
 export const DEFAULT_GEMINI_THINKING_LEVEL = ThinkingLevel.LOW;
+
+/**
+ * Gemini 3 reduce cada imagen a un presupuesto fijo de tokens (~1120 por defecto) sin importar
+ * cuántos píxeles le mandemos. ULTRA_HIGH (~2240) conserva la letra chica de boletas largas;
+ * el costo extra son ~1000 tokens de entrada por boleta. Los modelos 2.x ignoran el campo.
+ */
+const RECEIPT_IMAGE_RESOLUTION = PartMediaResolutionLevel.MEDIA_RESOLUTION_ULTRA_HIGH;
 
 /** `thinkingLevel` existe desde Gemini 3; los modelos 2.x lo rechazan con un 400. */
 const FIRST_MODEL_GENERATION_WITH_THINKING_LEVEL = 3;
@@ -95,7 +107,7 @@ export function createGeminiExtractor({
           {
             role: "user",
             parts: [
-              createPartFromBase64(image.base64Data, image.mimeType),
+              createPartFromBase64(image.base64Data, image.mimeType, RECEIPT_IMAGE_RESOLUTION),
               { text: EXTRACTION_USER_PROMPT },
             ],
           },

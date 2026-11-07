@@ -3,9 +3,10 @@
 # RecAIpt
 
 PWA (Next.js) para leer boletas con una foto: las reescribe en letra grande, agrupa ítems
-repetidos y verifica que la suma cuadre. Usuario principal: adulto mayor con baja visión
-(hoy saca foto a la boleta y le hace zoom). Prioridades: 1) lectura, 2) agrupar,
-3) verificar sumas (sobre todo boletas escritas a mano).
+repetidos y verifica que la suma cuadre. Usuario principal: adulto (~58 años, sin problemas
+motrices) al que le cuesta leer la letra chica de las boletas: hoy saca foto a la boleta y le
+hace zoom. Prioridades: 1) lectura, 2) agrupar, 3) verificar sumas (sobre todo boletas
+escritas a mano). Caso a cubrir: boletas largas que no caben bien en una sola foto.
 
 ## Arquitectura
 

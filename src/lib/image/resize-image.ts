@@ -1,9 +1,13 @@
-/** Lado mayor máximo: suficiente para leer boletas largas, liviano para enviar. */
-const MAX_IMAGE_SIDE_PX = 2000;
+/**
+ * Tope por cantidad de píxeles, no por lado mayor: una boleta larga fotografiada entera ocupa
+ * una franja angosta del cuadro, y limitar el lado mayor dejaba el texto en ~9 px por carácter.
+ * 6 MP en JPEG 0.85 pesa ~1,5-3 MB, bajo el límite de la API (MAX_RECEIPT_IMAGE_BYTES).
+ */
+const MAX_IMAGE_PIXELS = 6_000_000;
 const JPEG_QUALITY = 0.85;
 
-function calculateScale(width: number, height: number, maxSide: number): number {
-  return Math.min(1, maxSide / Math.max(width, height));
+function calculateScale(width: number, height: number, maxPixels: number): number {
+  return Math.min(1, Math.sqrt(maxPixels / (width * height)));
 }
 
 function canvasToJpegBlob(canvas: HTMLCanvasElement, quality: number): Promise<Blob> {
@@ -20,9 +24,12 @@ function canvasToJpegBlob(canvas: HTMLCanvasElement, quality: number): Promise<B
  * Reduce la foto en el teléfono antes de enviarla (menos tokens, menos latencia) y la
  * convierte a JPEG, corrigiendo la orientación EXIF de la cámara.
  */
-export async function resizeImageToJpeg(file: Blob, maxSide = MAX_IMAGE_SIDE_PX): Promise<Blob> {
+export async function resizeImageToJpeg(
+  file: Blob,
+  maxPixels = MAX_IMAGE_PIXELS,
+): Promise<Blob> {
   const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
-  const scale = calculateScale(bitmap.width, bitmap.height, maxSide);
+  const scale = calculateScale(bitmap.width, bitmap.height, maxPixels);
   const canvas = document.createElement("canvas");
   canvas.width = Math.round(bitmap.width * scale);
   canvas.height = Math.round(bitmap.height * scale);
