@@ -1,0 +1,29 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "recaipt",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-11-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  // Protege la cuota del LLM: 10 lecturas por minuto por IP (ver src/lib/api/rate-limit.ts).
+  "ratelimits": [
+    {
+      "name": "RECEIPT_RATE_LIMITER",
+      "namespace_id": "1001",
+      "simple": { "limit": 10, "period": 60 }
+    }
+  ],
+  "observability": {
+    "enabled": true
+  },
+  // Configuración no secreta. Las API keys van como secrets:
+  //   npx wrangler secret put GEMINI_API_KEY
+  "vars": {
+    "LLM_PROVIDER": "gemini",
+    "GEMINI_MODEL": "gemini-3.5-flash",
+    "GEMINI_THINKING_LEVEL": "LOW"
+  }
+}

@@ -9,8 +9,6 @@ const LOCAL_NETWORK_DEV_ORIGINS = ["192.168.*.*", "10.*.*.*", "172.*.*.*", "*.lo
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: LOCAL_NETWORK_DEV_ORIGINS,
-  cacheComponents: true,
-  partialPrefetching: true,
   turbopack: {
     rules: {
       "*.css": {

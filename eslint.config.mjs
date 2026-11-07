@@ -11,11 +11,21 @@ const eslintConfig = defineConfig([
   prettierConfig,
   {
     rules: {
-      "max-lines": ["error", { max: MAX_LINES_PER_FILE, skipBlankLines: false, skipComments: false }],
+      "max-lines": [
+        "error",
+        { max: MAX_LINES_PER_FILE, skipBlankLines: false, skipComments: false },
+      ],
       "no-duplicate-imports": "error",
     },
   },
-  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts"]),
+  globalIgnores([
+    ".next/**",
+    ".open-next/**",
+    ".wrangler/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
+  ]),
 ]);
 
 export default eslintConfig;

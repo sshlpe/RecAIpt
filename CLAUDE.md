@@ -18,6 +18,9 @@ repetidos y verifica que la suma cuadre. Usuario principal: adulto mayor con baj
   (`src/lib/receipt/editable-receipt.ts`, funciones puras) y todo se recalcula con
   `summarizeReceipt`. El "total real" sale de los productos, no del total escrito.
 - La API key vive solo en el servidor (route handler `src/app/api/analyze-receipt/`).
+- **Deploy en Cloudflare Workers** vía OpenNext (`wrangler.jsonc`, `open-next.config.ts`).
+  El adaptador empaqueta los `.env*` dentro del Worker: las keys van como secrets de Cloudflare.
+  `src/lib/api/rate-limit.ts` limita lecturas por IP (binding `RECEIPT_RATE_LIMITER`).
 - Ante una suma que no cuadra, la UI nunca dice "te cobraron de más": señala las líneas
   dudosas para revisar. Un error de lectura y un error de cobro se ven igual.
 

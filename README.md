@@ -38,6 +38,20 @@ Para usar Claude: `LLM_PROVIDER=claude` y `ANTHROPIC_API_KEY` en `.env.local`.
 Para probar desde el teléfono, abre la URL de "Network" que muestra `npm run dev`
 (mismo Wi-Fi o hotspot).
 
+## Publicar en Cloudflare
+
+La app corre como Cloudflare Worker con el adaptador
+[OpenNext](https://opennext.js.org/cloudflare) (configuración en `wrangler.jsonc`).
+
+- **Deploy**: con Workers Builds, cada push a `main` compila y publica
+  (build: `npx opennextjs-cloudflare build`, deploy: `npx opennextjs-cloudflare deploy`).
+- **API key**: como secret del Worker (`npx wrangler secret put GEMINI_API_KEY` o desde el panel).
+  Nunca en archivos `.env*` al publicar: el adaptador los empaqueta dentro del Worker, y
+  `npm run deploy` se niega a publicar si los encuentra con keys.
+- **Límite de uso**: 10 lecturas por minuto por IP (binding `RECEIPT_RATE_LIMITER`), para que
+  una URL pública no agote la cuota del LLM.
+- **Probar localmente en el runtime de Workers**: `npm run cf:preview`.
+
 ## Contribuir
 
 Las convenciones del código están en [`CLAUDE.md`](CLAUDE.md): código modular y reutilizable,
