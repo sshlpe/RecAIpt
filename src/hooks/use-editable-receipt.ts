@@ -6,6 +6,7 @@ import {
   confirmItem,
   mergeGroupInto,
   removeItem,
+  setAddedTip,
   splitMergedItems,
   toEditableReceipt,
   updateItem,
@@ -15,6 +16,7 @@ import {
   type PrintedTotals,
 } from "@/lib/receipt/editable-receipt";
 import type { Receipt } from "@/lib/receipt/receipt-schema";
+import type { TipChoice } from "@/lib/receipt/tip";
 
 export interface EditableReceiptActions {
   saveItem: (itemId: string, draft: ItemDraft) => void;
@@ -25,6 +27,7 @@ export interface EditableReceiptActions {
   removeItem: (itemId: string) => void;
   confirmItem: (itemId: string) => void;
   saveTotals: (totals: PrintedTotals) => void;
+  setTip: (tip: TipChoice | null) => void;
 }
 
 /**
@@ -47,6 +50,7 @@ export function useEditableReceipt(extractedReceipt: Receipt) {
       removeItem: (itemId) => setReceipt((current) => removeItem(current, itemId)),
       confirmItem: (itemId) => setReceipt((current) => confirmItem(current, itemId)),
       saveTotals: (totals) => setReceipt((current) => updatePrintedTotals(current, totals)),
+      setTip: (tip) => setReceipt((current) => setAddedTip(current, tip)),
     }),
     [],
   );

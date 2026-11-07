@@ -15,18 +15,16 @@ function reviewButtonContent(issueCount: number, tone: Tone): { label: string; t
 
 /** Barra fija abajo: total calculado y acceso al detalle de lo que hay que revisar. */
 export function TotalBar({ summary, onOpenReview }: TotalBarProps) {
-  const { verification, issueCount, formatAmount, message } = summary;
+  const { charges, payableTotal, issueCount, formatAmount, message } = summary;
   const button = reviewButtonContent(issueCount, message.tone);
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-10 border-t-2 border-surface bg-background px-4 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
       <div className="mx-auto flex max-w-xl items-center justify-between gap-3">
         <div className="min-w-0" aria-live="polite">
-          <p className="text-sm text-muted">
-            Total{verification.tipIncluded ? " con propina" : ""}
-          </p>
+          <p className="text-sm text-muted">Total{charges.tip > 0 ? " con propina" : ""}</p>
           <p className="text-2xl font-extrabold whitespace-nowrap tabular-nums">
-            {formatAmount(verification.calculatedTotal)}
+            {formatAmount(payableTotal)}
           </p>
         </div>
         <button

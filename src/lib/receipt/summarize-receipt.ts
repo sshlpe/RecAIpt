@@ -1,4 +1,5 @@
 import { formatCurrency, normalizeCurrency } from "@/lib/format/currency";
+import type { SplitCharges } from "@/lib/split/compute-split";
 import { buildSpokenSummary } from "./build-spoken-summary";
 import { isDoubtful } from "./confidence";
 import {
@@ -8,6 +9,7 @@ import {
 } from "./describe-verification";
 import type { EditableItem, EditableReceipt } from "./editable-receipt";
 import { groupItemsByName, type ItemGroup } from "./group-items";
+import { calculateTipAmount } from "./tip";
 import { verifyReceipt, type ReceiptVerification } from "./verify-totals";
 
 export interface ItemIssue {
@@ -25,6 +27,10 @@ export interface ReceiptSummary {
   issuesByItemId: Map<string, ItemIssue>;
   issueCount: number;
   spokenSummary: string;
+  /** Consumo, descuento y propina efectiva (escrita o agregada por el usuario). */
+  charges: SplitCharges;
+  /** Lo que hay que pagar: consumo − descuento + propina. */
+  payableTotal: number;
 }
 
 const DEFAULT_DOUBT_MESSAGE = "No se leyó con total seguridad.";
@@ -56,6 +62,25 @@ function countTotalsIssues(verification: ReceiptVerification): number {
   return checks.filter((check) => check && !check.matches).length;
 }
 
+/** Base sobre la que se calcula un porcentaje de propina: consumo menos descuentos. */
+export function tipBase(receipt: EditableReceipt, itemsSum: number): number {
+  return itemsSum - (receipt.printedDiscount ?? 0);
+}
+
+/**
+ * Propina que se paga: la escrita (si el total de la boleta la incluye) o, si la boleta no trae,
+ * la que agregó el usuario.
+ */
+function effectiveTip(
+  receipt: EditableReceipt,
+  verification: ReceiptVerification,
+  currency: string,
+): number {
+  if (receipt.printedTip !== null) return verification.tipIncluded ? receipt.printedTip : 0;
+  if (!receipt.addedTip) return 0;
+  return calculateTipAmount(receipt.addedTip, tipBase(receipt, verification.itemsSum), currency);
+}
+
 /** Todo lo que la pantalla necesita mostrar, derivado de la boleta (editada o no). */
 export function summarizeReceipt(receipt: EditableReceipt): ReceiptSummary {
   const currency = normalizeCurrency(receipt.currency);
@@ -63,6 +88,11 @@ export function summarizeReceipt(receipt: EditableReceipt): ReceiptSummary {
   const verification = verifyReceipt({ ...receipt, currency });
   const groups = groupItemsByName(receipt.items, currency);
   const issuesByItemId = findItemIssues(receipt, verification, formatAmount);
+  const charges: SplitCharges = {
+    itemsSum: verification.itemsSum,
+    discount: receipt.printedDiscount ?? 0,
+    tip: effectiveTip(receipt, verification, currency),
+  };
 
   return {
     currency,
@@ -73,5 +103,7 @@ export function summarizeReceipt(receipt: EditableReceipt): ReceiptSummary {
     issuesByItemId,
     issueCount: issuesByItemId.size + countTotalsIssues(verification),
     spokenSummary: buildSpokenSummary(groups, verification, currency),
+    charges,
+    payableTotal: charges.itemsSum - charges.discount + charges.tip,
   };
 }

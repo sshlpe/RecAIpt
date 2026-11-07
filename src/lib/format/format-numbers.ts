@@ -8,6 +8,11 @@ export function formatQuantity(quantity: number): string {
   return quantity.toLocaleString(NUMBER_LOCALE, { maximumFractionDigits: QUANTITY_DECIMALS });
 }
 
+/** 5.8 -> "5,8%", 10 -> "10%". */
+export function formatPercent(percent: number): string {
+  return `${percent.toLocaleString(NUMBER_LOCALE, { maximumFractionDigits: 1 })}%`;
+}
+
 /** Valor inicial de un campo editable: sin separador de miles para que sea fácil de corregir. */
 export function formatNumberForInput(value: number | null, maxDecimals: number): string {
   if (value === null) return "";

@@ -1,6 +1,7 @@
 import { roundToCurrency, smallestCurrencyUnit } from "@/lib/format/currency";
 import { sumBy } from "@/lib/math/sum-by";
 import { isDoubtful } from "./confidence";
+import { tipPercentOf } from "./tip";
 import type { Receipt, ReceiptItem } from "./receipt-schema";
 
 export interface AmountComparison {
@@ -90,9 +91,8 @@ export function calculateTotal(
 }
 
 export function calculateTipPercentage(receipt: Receipt, itemsSum: number): number | null {
-  const base = itemsSum - (receipt.printedDiscount ?? 0);
-  if (receipt.printedTip === null || base <= 0) return null;
-  return Math.round((receipt.printedTip / base) * 1000) / 10;
+  if (receipt.printedTip === null) return null;
+  return tipPercentOf(receipt.printedTip, itemsSum - (receipt.printedDiscount ?? 0));
 }
 
 export function verifyReceipt(receipt: Receipt): ReceiptVerification {

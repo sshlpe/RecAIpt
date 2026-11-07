@@ -1,3 +1,4 @@
+import { formatPercent } from "@/lib/format/format-numbers";
 import type { ReceiptVerification } from "./verify-totals";
 
 export type VerificationTone = "success" | "warning" | "info";
@@ -39,7 +40,7 @@ function describeMismatches(verification: ReceiptVerification, format: AmountFor
 
 function describeTip(verification: ReceiptVerification): string[] {
   if (verification.tipPercentage === null) return [];
-  return [`La propina es el ${verification.tipPercentage.toLocaleString("es-CL")}% de la cuenta.`];
+  return [`La propina es el ${formatPercent(verification.tipPercentage)} de la cuenta.`];
 }
 
 function describeDoubts(verification: ReceiptVerification): string[] {

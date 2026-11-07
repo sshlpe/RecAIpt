@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useBillSplit } from "@/hooks/use-bill-split";
 import { useEditableReceipt } from "@/hooks/use-editable-receipt";
 import type { Receipt } from "@/lib/receipt/receipt-schema";
 import { summarizeReceipt } from "@/lib/receipt/summarize-receipt";
@@ -9,17 +10,21 @@ import { GroupedItemList, OriginalItemList } from "./item-lists";
 import { CaptureReceiptButton } from "./capture-receipt-button";
 import { ReceiptSheets, type ActiveSheet } from "./receipt-sheets";
 import { SpeakButton } from "./speak-button";
+import { SplitView } from "./split/split-view";
+import { TipSelector } from "./tip-selector";
 import { TotalBar } from "./total-bar";
 import { IconButton } from "./ui/icon-button";
 import { ImageIcon, PlusIcon } from "./ui/icons";
 import { SegmentedToggle } from "./ui/segmented-toggle";
 import { VerificationSummary } from "./verification-summary";
 
-type ItemView = "grouped" | "original";
+type ItemView = "grouped" | "original" | "split";
 
+/** "Original" en vez de "Como en la boleta" para que entren tres opciones en un teléfono. */
 const ITEM_VIEW_OPTIONS: { value: ItemView; label: string }[] = [
   { value: "grouped", label: "Agrupado" },
-  { value: "original", label: "Como en la boleta" },
+  { value: "original", label: "Original" },
+  { value: "split", label: "Dividir" },
 ];
 
 interface ReceiptResultProps {
@@ -37,6 +42,8 @@ export function ReceiptResult({
   const summary = useMemo(() => summarizeReceipt(receipt), [receipt]);
   const [itemView, setItemView] = useState<ItemView>("grouped");
   const [sheet, setSheet] = useState<ActiveSheet>(null);
+  // La división vive aquí (no en la vista) para no perderla al cambiar de pestaña.
+  const billSplit = useBillSplit();
 
   const itemHandlers: ItemActionHandlers = {
     onQuickEdit: (itemId) => setSheet({ kind: "quick-edit", itemId }),
@@ -63,10 +70,19 @@ export function ReceiptResult({
             selected={itemView}
             onSelect={setItemView}
           />
-          {itemView === "grouped" ? (
-            <GroupedItemList groups={summary.groups} {...listProps} />
-          ) : (
-            <OriginalItemList items={receipt.items} {...listProps} />
+          {itemView === "grouped" && <GroupedItemList groups={summary.groups} {...listProps} />}
+          {itemView === "original" && <OriginalItemList items={receipt.items} {...listProps} />}
+          <TipSelector
+            printedTip={receipt.printedTip}
+            addedTip={receipt.addedTip}
+            tipAmount={summary.charges.tip}
+            tipBase={summary.charges.itemsSum - summary.charges.discount}
+            currency={summary.currency}
+            formatAmount={summary.formatAmount}
+            onChange={actions.setTip}
+          />
+          {itemView === "split" && (
+            <SplitView summary={summary} split={billSplit.split} actions={billSplit.actions} />
           )}
         </>
       )}

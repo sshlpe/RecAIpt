@@ -2,6 +2,10 @@
 
 /* Tokens pensados para baja visión: alto contraste y letra base grande. */
 :root {
+  /* Papel térmico de boleta: igual en modo claro y oscuro (el papel es papel). */
+  --paper: #eef1f5;
+  --ink: #17213a;
+  --ink-muted: #56607a;
   --background: #ffffff;
   --foreground: #111111;
   --muted: #4a4a4a;
@@ -50,6 +54,12 @@
   --color-warning-surface: var(--warning-surface);
   --color-info: var(--info);
   --color-info-surface: var(--info-surface);
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  /* Atkinson Hyperlegible: diseñada para baja visión (distingue 1/l/I, 0/O, 5/S). */
+  --font-sans: var(--font-atkinson);
+  --font-mono: var(--font-atkinson-mono);
 }
 
 html {
@@ -60,11 +70,45 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family:
-    system-ui,
-    -apple-system,
-    "Segoe UI",
-    Roboto,
-    sans-serif;
-  line-height: 1.4;
+  font-family: var(--font-atkinson), system-ui, sans-serif;
+  line-height: 1.45;
+}
+
+/*
+ * Trozo de boleta: borde inferior cortado en zigzag con una máscara (dientes de --tooth).
+ * El padding inferior deja espacio para que los dientes no corten el contenido.
+ */
+.receipt-paper {
+  --tooth: 22px;
+  background: var(--paper);
+  color: var(--ink);
+  padding-bottom: calc(var(--tooth) + 1.25rem);
+  mask:
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / var(--tooth)
+      calc(var(--tooth) / 2) repeat-x,
+    linear-gradient(#000 0 0) top / 100% calc(100% - var(--tooth) / 2 + 1px) no-repeat;
+}
+
+/* Franja de luz que recorre la foto mientras se lee: muestra que se trabaja sobre SU boleta. */
+@keyframes receipt-scan {
+  from {
+    top: -20%;
+  }
+  to {
+    top: 100%;
+  }
+}
+
+.receipt-scan-line {
+  position: absolute;
+  inset-inline: 0;
+  height: 20%;
+  background: linear-gradient(to bottom, #0000, rgb(127 176 255 / 0.6), #0000);
+  animation: receipt-scan 1.8s ease-in-out infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .receipt-scan-line {
+    display: none;
+  }
 }

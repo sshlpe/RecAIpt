@@ -1,5 +1,6 @@
 import { toGroupingKey } from "./group-items";
 import type { Receipt, ReceiptItem } from "./receipt-schema";
+import type { TipChoice } from "./tip";
 
 /**
  * Boleta que el usuario puede corregir. Las funciones son puras (devuelven una copia),
@@ -15,6 +16,8 @@ export interface EditableItem extends ReceiptItem {
 
 export interface EditableReceipt extends Omit<Receipt, "items"> {
   items: EditableItem[];
+  /** Propina agregada por el usuario; solo aplica si la boleta no trae propina escrita. */
+  addedTip: TipChoice | null;
 }
 
 /** Lo que el usuario puede escribir de un producto. */
@@ -61,6 +64,7 @@ export function toEditableReceipt(receipt: Receipt): EditableReceipt {
       userEdited: false,
       mergedFrom: null,
     })),
+    addedTip: null,
   };
 }
 
@@ -161,6 +165,10 @@ export function addItem(receipt: EditableReceipt, draft: ItemDraft): EditableRec
     mergedFrom: null,
   };
   return { ...receipt, items: [...receipt.items, newItem] };
+}
+
+export function setAddedTip(receipt: EditableReceipt, tip: TipChoice | null): EditableReceipt {
+  return { ...receipt, addedTip: tip };
 }
 
 export function updatePrintedTotals(
