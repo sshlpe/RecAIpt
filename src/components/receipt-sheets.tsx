@@ -77,6 +77,7 @@ function SheetContent({
           currency={currency}
           issuesByItemId={summary.issuesByItemId}
           onSplit={() => (actions.splitItems(sheet.itemIds), close())}
+          onSaveAmount={(itemId, lineTotal) => (actions.saveLineTotal(itemId, lineTotal), close())}
           {...itemHandlers}
         />
       );

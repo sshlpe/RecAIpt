@@ -16,7 +16,10 @@ export interface EditableItem extends ReceiptItem {
 
 export interface EditableReceipt extends Omit<Receipt, "items"> {
   items: EditableItem[];
-  /** Propina agregada por el usuario; solo aplica si la boleta no trae propina escrita. */
+  /**
+   * Propina elegida por el usuario. null = usar la escrita en la boleta (si hay). Tiene prioridad
+   * sobre la escrita: sirve para corregir una mala lectura o dar otra que la sugerida.
+   */
   addedTip: TipChoice | null;
 }
 

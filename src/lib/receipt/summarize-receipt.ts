@@ -68,17 +68,14 @@ export function tipBase(receipt: EditableReceipt, itemsSum: number): number {
 }
 
 /**
- * Propina que se paga: la escrita (si el total de la boleta la incluye) o, si la boleta no trae,
- * la que agregó el usuario.
+ * Propina que se paga: la que eligió el usuario; si no eligió, la escrita en la boleta
+ * (sugerida o incluida). La verificación de la boleta sigue usando solo la escrita.
  */
-function effectiveTip(
-  receipt: EditableReceipt,
-  verification: ReceiptVerification,
-  currency: string,
-): number {
-  if (receipt.printedTip !== null) return verification.tipIncluded ? receipt.printedTip : 0;
-  if (!receipt.addedTip) return 0;
-  return calculateTipAmount(receipt.addedTip, tipBase(receipt, verification.itemsSum), currency);
+function effectiveTip(receipt: EditableReceipt, itemsSum: number, currency: string): number {
+  if (receipt.addedTip) {
+    return calculateTipAmount(receipt.addedTip, tipBase(receipt, itemsSum), currency);
+  }
+  return receipt.printedTip ?? 0;
 }
 
 /** Todo lo que la pantalla necesita mostrar, derivado de la boleta (editada o no). */
@@ -91,7 +88,7 @@ export function summarizeReceipt(receipt: EditableReceipt): ReceiptSummary {
   const charges: SplitCharges = {
     itemsSum: verification.itemsSum,
     discount: receipt.printedDiscount ?? 0,
-    tip: effectiveTip(receipt, verification, currency),
+    tip: effectiveTip(receipt, verification.itemsSum, currency),
   };
 
   return {

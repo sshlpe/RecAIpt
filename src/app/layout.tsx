@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Atkinson_Hyperlegible_Mono, Atkinson_Hyperlegible_Next } from "next/font/google";
-import { APP_DESCRIPTION, APP_NAME } from "@/lib/config/app-info";
+import { APP_DESCRIPTION, APP_NAME, BRAND_BACKGROUND } from "@/lib/config/app-info";
 import "./globals.css";
 
 /** Familia diseñada para baja visión; la Mono imita la impresión de una boleta. */
@@ -23,7 +23,7 @@ export const viewport: Viewport = {
   viewportFit: "cover",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0b1a33" },
+    { media: "(prefers-color-scheme: dark)", color: BRAND_BACKGROUND },
   ],
 };
 

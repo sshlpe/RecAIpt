@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Fondo azul marino de la app. El script de íconos quita el redondeo para iOS/Android. -->
+  <rect id="background" width="512" height="512" rx="112" fill="#0b1a33"/>
+  <!-- Boleta de papel térmico con el borde inferior cortado en zigzag (dientes de 40 px). -->
+  <path fill="#eef1f5" d="
+    M 156 96 H 356 Q 376 96 376 116 V 392
+    L 356 412 L 336 392 L 316 412 L 296 392 L 276 412 L 256 392
+    L 236 412 L 216 392 L 196 412 L 176 392 L 156 412 L 136 392
+    V 116 Q 136 96 156 96 Z"/>
+  <!-- Líneas "impresas". -->
+  <rect x="172" y="144" width="168" height="20" rx="10" fill="#17213a"/>
+  <rect x="172" y="190" width="120" height="20" rx="10" fill="#17213a"/>
+  <rect x="172" y="236" width="148" height="20" rx="10" fill="#17213a"/>
+  <!-- ✓ de "revisado", como en las líneas del inicio. -->
+  <path d="M 214 316 L 244 346 L 302 284" fill="none" stroke="#2563eb" stroke-width="30"
+    stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

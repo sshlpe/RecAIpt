@@ -9,39 +9,57 @@ export interface ItemActionHandlers {
   onConfirmItem: (itemId: string) => void;
 }
 
-interface ItemActionsProps extends ItemActionHandlers {
-  itemId: string;
-  issue?: ItemIssue;
+/** Qué no se leyó bien de una línea (no muestra nada si no hay duda). */
+export function IssueNote({ issue }: { issue?: ItemIssue }) {
+  if (!issue) return null;
+  return (
+    <p className="rounded-xl border-2 border-warning bg-background p-3 text-base">
+      <span className="font-bold text-warning">⚠ </span>
+      {issue.message}
+    </p>
+  );
 }
 
-/** Qué pasó con la línea (si hay duda) y los botones compactos para corregirla o confirmarla. */
-export function ItemActions({
+interface ItemActionButtonsProps extends ItemActionHandlers {
+  itemId: string;
+  issue?: ItemIssue;
+  /** Sin el lápiz cuando el campo del monto ya está a la vista. */
+  showQuickEdit?: boolean;
+}
+
+/** Botones compactos: ✏️ monto, ⚙️ edición avanzada y "Está bien" si hay una duda de lectura. */
+export function ItemActionButtons({
   itemId,
   issue,
+  showQuickEdit = true,
   onQuickEdit,
   onAdvancedEdit,
   onConfirmItem,
-}: ItemActionsProps) {
+}: ItemActionButtonsProps) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {showQuickEdit && (
+        <IconButton icon="✏️" label="Corregir monto" onClick={() => onQuickEdit(itemId)} />
+      )}
+      <IconButton icon="⚙️" label="Edición avanzada" onClick={() => onAdvancedEdit(itemId)} />
+      {issue?.canDismiss && (
+        <IconButton
+          icon="✓"
+          text="Está bien"
+          label="Está bien: la lectura es correcta"
+          onClick={() => onConfirmItem(itemId)}
+        />
+      )}
+    </div>
+  );
+}
+
+/** Qué pasó con la línea (si hay duda) y los botones para corregirla o confirmarla. */
+export function ItemActions(props: ItemActionButtonsProps) {
   return (
     <div className="space-y-3">
-      {issue && (
-        <p className="rounded-xl border-2 border-warning bg-background p-3 text-base">
-          <span className="font-bold text-warning">⚠ </span>
-          {issue.message}
-        </p>
-      )}
-      <div className="flex flex-wrap gap-2">
-        <IconButton icon="✏️" label="Corregir monto" onClick={() => onQuickEdit(itemId)} />
-        <IconButton icon="⚙️" label="Edición avanzada" onClick={() => onAdvancedEdit(itemId)} />
-        {issue?.canDismiss && (
-          <IconButton
-            icon="✓"
-            text="Está bien"
-            label="Está bien: la lectura es correcta"
-            onClick={() => onConfirmItem(itemId)}
-          />
-        )}
-      </div>
+      <IssueNote issue={props.issue} />
+      <ItemActionButtons {...props} />
     </div>
   );
 }

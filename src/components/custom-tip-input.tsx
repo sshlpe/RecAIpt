@@ -2,9 +2,18 @@
 
 import { useState } from "react";
 import { getCurrencyDecimals } from "@/lib/format/currency";
-import { formatPercent, parseLocaleNumber } from "@/lib/format/format-numbers";
+import {
+  formatNumberForInput,
+  formatPercent,
+  parseLocaleNumber,
+} from "@/lib/format/format-numbers";
 import type { AmountFormatter } from "@/lib/receipt/describe-verification";
-import { calculateTipAmount, tipPercentOf, type TipChoice } from "@/lib/receipt/tip";
+import {
+  calculateTipAmount,
+  tipChoiceValue,
+  tipPercentOf,
+  type TipChoice,
+} from "@/lib/receipt/tip";
 import { SegmentedToggle } from "./ui/segmented-toggle";
 import { TextField } from "./ui/text-field";
 
@@ -27,10 +36,19 @@ interface CustomTipInputProps {
   onChange: (tip: TipChoice) => void;
 }
 
+function decimalsFor(unit: TipUnit, currency: string): number {
+  return unit === "percent" ? PERCENT_DECIMALS : getCurrencyDecimals(currency);
+}
+
+/** Texto inicial del campo: el valor de partida (ej: la propina sugerida), vacío si es 0. */
+function initialText(initial: TipChoice | null, currency: string): string {
+  if (!initial || tipChoiceValue(initial) <= 0) return "";
+  return formatNumberForInput(tipChoiceValue(initial), decimalsFor(initial.kind, currency));
+}
+
 /** Convierte lo escrito en una propina; texto vacío o inválido cuenta como 0. */
 function toChoice(unit: TipUnit, text: string, currency: string): TipChoice {
-  const decimals = unit === "percent" ? PERCENT_DECIMALS : getCurrencyDecimals(currency);
-  const parsed = parseLocaleNumber(text, decimals);
+  const parsed = parseLocaleNumber(text, decimalsFor(unit, currency));
   const value = parsed !== null && parsed >= 0 ? parsed : 0;
   return unit === "percent"
     ? { kind: "percent", percent: value }
@@ -54,7 +72,7 @@ function describeConversion(choice: TipChoice, props: CustomTipInputProps): stri
 export function CustomTipInput(props: CustomTipInputProps) {
   const { initial, currency, onChange } = props;
   const [unit, setUnit] = useState<TipUnit>(initial?.kind ?? "percent");
-  const [text, setText] = useState("");
+  const [text, setText] = useState(() => initialText(initial, currency));
   const conversion = describeConversion(toChoice(unit, text, currency), props);
 
   function update(nextUnit: TipUnit, nextText: string) {

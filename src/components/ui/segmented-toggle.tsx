@@ -21,7 +21,8 @@ export function SegmentedToggle<T extends string>({
     <div
       role="group"
       aria-label={ariaLabel}
-      className="grid grid-flow-col gap-2 rounded-2xl bg-surface p-1"
+      // Se reparte en columnas iguales y pasa a otra fila si no caben (ej: 5 opciones).
+      className="grid grid-cols-[repeat(auto-fit,minmax(5.5rem,1fr))] gap-2 rounded-2xl bg-surface p-1"
     >
       {options.map((option) => (
         <button

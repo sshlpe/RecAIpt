@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { APP_DESCRIPTION, APP_NAME } from "@/lib/config/app-info";
+import { APP_DESCRIPTION, APP_NAME, BRAND_BACKGROUND } from "@/lib/config/app-info";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
@@ -10,8 +10,13 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: "/",
     display: "standalone",
     orientation: "portrait",
-    background_color: "#ffffff",
-    theme_color: "#ffffff",
-    icons: [{ src: "/favicon.ico", sizes: "any", type: "image/x-icon" }],
+    background_color: BRAND_BACKGROUND,
+    theme_color: BRAND_BACKGROUND,
+    // Generados desde src/app/icon.svg con scripts/generate-icons.sh.
+    icons: [
+      { src: "/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+      { src: "/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
+      { src: "/icon-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+    ],
   };
 }

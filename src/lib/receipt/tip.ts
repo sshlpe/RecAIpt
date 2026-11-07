@@ -3,6 +3,14 @@ import { roundToCurrency } from "@/lib/format/currency";
 /** Propina agregada por el usuario cuando la boleta no la trae. */
 export type TipChoice = { kind: "percent"; percent: number } | { kind: "amount"; amount: number };
 
+/** "Sin propina" explícito: distinto de null, que significa "usar la de la boleta". */
+export const NO_TIP: TipChoice = { kind: "amount", amount: 0 };
+
+/** El número que escribió el usuario, sea porcentaje o monto. */
+export function tipChoiceValue(choice: TipChoice): number {
+  return choice.kind === "percent" ? choice.percent : choice.amount;
+}
+
 /** Porcentajes ofrecidos (en Chile la propina sugerida es 10%). */
 export const TIP_PERCENT_PRESETS = [10, 15] as const;
 

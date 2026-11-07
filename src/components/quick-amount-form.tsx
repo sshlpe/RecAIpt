@@ -14,10 +14,20 @@ interface QuickAmountFormProps {
   item: EditableItem;
   currency: string;
   onSave: (lineTotal: number) => void;
+  /** Nombre de la línea arriba del campo; se omite si el título del popup ya lo dice. */
+  showHeading?: boolean;
+  /** Abrir el teclado al mostrarse (desde el ✏️ sí; en el detalle del producto, no). */
+  autoFocus?: boolean;
 }
 
-/** Edición rápida: un solo campo con el monto de la línea, con el teclado numérico abierto. */
-export function QuickAmountForm({ item, currency, onSave }: QuickAmountFormProps) {
+/** Edición rápida: un solo campo con el monto de la línea. */
+export function QuickAmountForm({
+  item,
+  currency,
+  onSave,
+  showHeading = true,
+  autoFocus = true,
+}: QuickAmountFormProps) {
   const decimals = getCurrencyDecimals(currency);
   const [value, setValue] = useState(() => formatNumberForInput(item.lineTotal, decimals));
   const [hasError, setHasError] = useState(false);
@@ -32,13 +42,13 @@ export function QuickAmountForm({ item, currency, onSave }: QuickAmountFormProps
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <p className="text-lg font-semibold">{describeItemLine(item)}</p>
+        {showHeading && <p className="text-lg font-semibold">{describeItemLine(item)}</p>}
         <InterpretedText text={findInterpretedText(item)} />
       </div>
       <TextField
         label="Monto de la línea"
         inputMode="decimal"
-        autoFocus
+        autoFocus={autoFocus}
         value={value}
         onChange={(event) => setValue(event.target.value)}
       />
