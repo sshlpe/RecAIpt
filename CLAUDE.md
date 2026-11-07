@@ -51,8 +51,11 @@ src/
   components/          componentes de la app
   hooks/               estado de React (análisis de la foto, boleta editable)
     ui/                componentes visuales genéricos reutilizables
+    split/             vista "Dividir"
   lib/
-    receipt/           schema, agrupación, verificación de sumas
+    receipt/           schema, agrupación, verificación de sumas, propina, boleta editable
+    split/             dividir la cuenta en grupos (asignación y cálculo)
+    math/              utilidades numéricas genéricas (sumBy, redondeo sin descuadre)
     extraction/        prompt, interfaz ReceiptExtractor, proveedores LLM
     image/             reducción de imagen en el cliente
     speech/            lectura en voz alta

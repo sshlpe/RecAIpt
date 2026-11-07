@@ -63,10 +63,16 @@ export const receiptSchema = z.object({
     ),
   items: z.array(receiptItemSchema).describe("Cada línea de producto cobrado, en orden."),
   printedSubtotal: optionalAmountField(
-    "Subtotal escrito que debería ser la suma de los productos. NO uses la base imponible, " +
-      'el neto ni montos "sin IVA": esos excluyen impuestos y no equivalen a la suma.',
+    "Monto escrito que corresponde a la SUMA DE LOS PRODUCTOS, se llame Subtotal, Valor o " +
+      'Consumo. Si la línea "Subtotal" ya incluye impuestos agregados aparte, NO es esta. ' +
+      'Tampoco la base imponible, el neto ni montos "sin IVA".',
   ),
   printedDiscount: optionalAmountField("Descuento total escrito, como número positivo."),
+  printedTaxes: optionalAmountField(
+    "Impuestos que se SUMAN APARTE al consumo (ej: IPC o impuesto al consumo, IVA agregado " +
+      "al final, cargo por servicio obligatorio). Si hay varios, súmalos. NO incluyas impuestos " +
+      "ya incluidos en los precios (ej: el IVA de una boleta chilena).",
+  ),
   printedTip: optionalAmountField("Propina escrita."),
   printedTotal: optionalAmountField("Total final a pagar escrito."),
 });

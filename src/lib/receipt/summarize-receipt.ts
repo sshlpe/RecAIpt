@@ -29,7 +29,7 @@ export interface ReceiptSummary {
   spokenSummary: string;
   /** Consumo, descuento y propina efectiva (escrita o agregada por el usuario). */
   charges: SplitCharges;
-  /** Lo que hay que pagar: consumo − descuento + propina. */
+  /** Lo que hay que pagar: consumo − descuento + impuestos agregados + propina. */
   payableTotal: number;
 }
 
@@ -88,6 +88,7 @@ export function summarizeReceipt(receipt: EditableReceipt): ReceiptSummary {
   const charges: SplitCharges = {
     itemsSum: verification.itemsSum,
     discount: receipt.printedDiscount ?? 0,
+    taxes: receipt.printedTaxes ?? 0,
     tip: effectiveTip(receipt, verification.itemsSum, currency),
   };
 
@@ -101,6 +102,6 @@ export function summarizeReceipt(receipt: EditableReceipt): ReceiptSummary {
     issueCount: issuesByItemId.size + countTotalsIssues(verification),
     spokenSummary: buildSpokenSummary(groups, verification, currency),
     charges,
-    payableTotal: charges.itemsSum - charges.discount + charges.tip,
+    payableTotal: charges.itemsSum - charges.discount + charges.taxes + charges.tip,
   };
 }

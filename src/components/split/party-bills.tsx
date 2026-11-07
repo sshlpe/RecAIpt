@@ -30,6 +30,12 @@ function PartyBillCard({ bill, formatAmount }: { bill: PartyBill; formatAmount: 
               <span className="tabular-nums">−{formatAmount(bill.discount)}</span>
             </li>
           )}
+          {bill.taxes > 0 && (
+            <li className="flex justify-between gap-4">
+              <span>Su parte de los impuestos</span>
+              <span className="tabular-nums">{formatAmount(bill.taxes)}</span>
+            </li>
+          )}
           {bill.tip > 0 && (
             <li className="flex justify-between gap-4">
               <span>Su parte de la propina</span>

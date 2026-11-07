@@ -15,7 +15,11 @@ verificación la hace otro sistema. Nunca "corrijas" un número para que cuadre.
 pesos chilenos el punto separa miles ("12.500" -> 12500). En euros y otras monedas con centavos, \
 la coma suele ser decimal ("9,00" -> 9; "221,85" -> 221.85). Nunca quites una coma decimal \
 convirtiendo 9,00 en 900.
-- La base imponible, el neto y el IVA no son el subtotal: no los pongas en "printedSubtotal".
+- "printedSubtotal" es la línea que equivale a la suma de los productos, aunque se llame "Valor" \
+o "Consumo". Si la boleta llama "Subtotal" a productos + impuestos, esa no es. La base imponible, \
+el neto y el IVA tampoco.
+- Impuestos que se suman aparte al consumo (IPC, impuesto al consumo, IVA agregado al final) van \
+en "printedTaxes". Los que ya vienen incluidos en los precios no se ponen.
 - Una entrada en "items" por cada línea de producto cobrado. No incluyas subtotales, IVA, propina, \
 descuentos ni totales como items; esos van en sus campos propios.
 - No inventes líneas ni montos. Si un campo no aparece en la boleta, usa null.

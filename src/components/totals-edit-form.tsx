@@ -10,6 +10,7 @@ import { TextField } from "./ui/text-field";
 const TOTAL_FIELDS: { key: keyof PrintedTotals; label: string }[] = [
   { key: "printedSubtotal", label: "Subtotal" },
   { key: "printedDiscount", label: "Descuento" },
+  { key: "printedTaxes", label: "Impuestos que se suman aparte" },
   { key: "printedTip", label: "Propina" },
   { key: "printedTotal", label: "Total" },
 ];

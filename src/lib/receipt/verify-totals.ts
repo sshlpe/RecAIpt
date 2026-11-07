@@ -74,6 +74,11 @@ function closestTo(candidates: number[], target: number): number {
   );
 }
 
+/** Productos − descuento + impuestos agregados aparte: lo que se cobra antes de la propina. */
+export function amountBeforeTip(receipt: Receipt, itemsSum: number): number {
+  return itemsSum - (receipt.printedDiscount ?? 0) + (receipt.printedTaxes ?? 0);
+}
+
 /**
  * Total "real" a partir de los productos. Si hay propina, se incluye; salvo que el total escrito
  * claramente no la incluya (varía según el local), para comparar lo mismo con lo mismo.
@@ -82,7 +87,7 @@ export function calculateTotal(
   receipt: Receipt,
   itemsSum: number,
 ): { amount: number; tipIncluded: boolean } {
-  const withoutTip = itemsSum - (receipt.printedDiscount ?? 0);
+  const withoutTip = amountBeforeTip(receipt, itemsSum);
   if (receipt.printedTip === null) return { amount: withoutTip, tipIncluded: false };
   const withTip = withoutTip + receipt.printedTip;
   if (receipt.printedTotal === null) return { amount: withTip, tipIncluded: true };

@@ -35,6 +35,12 @@ export function TotalBar({ summary, onOpenReview }: TotalBarProps) {
           {button.label}
         </button>
       </div>
+      {/*
+        Prolonga el fondo de la barra hacia abajo. En iPhone (Safari y Chrome) la barra del
+        navegador es semitransparente y la página sigue visible detrás de ella; sin esto se ve
+        el contenido pasando por debajo de la barra del total.
+      */}
+      <div aria-hidden className="absolute inset-x-0 top-full h-screen bg-background" />
     </div>
   );
 }

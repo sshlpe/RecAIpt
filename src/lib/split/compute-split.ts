@@ -10,10 +10,11 @@ import {
   type SplitParty,
 } from "./bill-split";
 
-/** Descuento y propina de la cuenta, que se reparten en proporción al consumo. */
+/** Descuento, impuestos agregados y propina: se reparten en proporción al consumo. */
 export interface SplitCharges {
   itemsSum: number;
   discount: number;
+  taxes: number;
   tip: number;
 }
 
@@ -27,6 +28,7 @@ export interface PartyBill {
   lines: PartyLine[];
   subtotal: number;
   discount: number;
+  taxes: number;
   tip: number;
   total: number;
 }
@@ -99,8 +101,10 @@ export function computeSplit(
     const subtotal = sumBy(lines, (line) => line.amount);
     const share = charges.itemsSum > 0 ? subtotal / charges.itemsSum : 0;
     const discount = charges.discount * share;
+    const taxes = charges.taxes * share;
     const tip = charges.tip * share;
-    return { party, lines, subtotal, discount, tip, total: subtotal - discount + tip };
+    const total = subtotal - discount + taxes + tip;
+    return { party, lines, subtotal, discount, taxes, tip, total };
   });
 
   const roundedTotals = distributeRounded(
@@ -115,6 +119,7 @@ export function computeSplit(
       lines: bill.lines.map((line) => ({ ...line, amount: round(line.amount) })),
       subtotal: round(bill.subtotal),
       discount: round(bill.discount),
+      taxes: round(bill.taxes),
       tip: round(bill.tip),
       total: roundedTotals[index],
     })),

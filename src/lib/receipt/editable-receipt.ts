@@ -28,7 +28,7 @@ export type ItemDraft = Pick<ReceiptItem, "name" | "quantity" | "unitPrice" | "l
 
 export type PrintedTotals = Pick<
   Receipt,
-  "printedSubtotal" | "printedDiscount" | "printedTip" | "printedTotal"
+  "printedSubtotal" | "printedDiscount" | "printedTaxes" | "printedTip" | "printedTotal"
 >;
 
 export const ADDED_ITEM_ORIGINAL_TEXT = "Agregado por ti";

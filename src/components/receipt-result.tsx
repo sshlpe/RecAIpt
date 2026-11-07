@@ -8,6 +8,7 @@ import { summarizeReceipt } from "@/lib/receipt/summarize-receipt";
 import type { ItemActionHandlers } from "./item-actions";
 import { GroupedItemList, OriginalItemList } from "./item-lists";
 import { CaptureReceiptButton } from "./capture-receipt-button";
+import { ChargesBreakdown } from "./charges-breakdown";
 import { ReceiptSheets, type ActiveSheet } from "./receipt-sheets";
 import { SpeakButton } from "./speak-button";
 import { SplitView } from "./split/split-view";
@@ -81,6 +82,7 @@ export function ReceiptResult({
             formatAmount={summary.formatAmount}
             onChange={actions.setTip}
           />
+          <ChargesBreakdown summary={summary} />
           {itemView === "split" && (
             <SplitView summary={summary} split={billSplit.split} actions={billSplit.actions} />
           )}
