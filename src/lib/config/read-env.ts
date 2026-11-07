@@ -1,7 +1,10 @@
 /** Falta configuración del servidor (no es culpa del usuario ni del modelo). */
 export class MissingConfigError extends Error {
   constructor(variableName: string) {
-    super(`Falta la variable de entorno ${variableName}. Revisa .env.local (ver .env.example).`);
+    super(
+      `Falta la variable de entorno ${variableName}. ` +
+        "En local: .env.local (ver .env.example). En Cloudflare: secret del Worker.",
+    );
     this.name = "MissingConfigError";
   }
 }

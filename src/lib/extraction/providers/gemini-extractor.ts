@@ -19,6 +19,19 @@ export const DEFAULT_GEMINI_MODEL = "gemini-3.5-flash";
  */
 export const DEFAULT_GEMINI_THINKING_LEVEL = ThinkingLevel.LOW;
 
+/** `thinkingLevel` existe desde Gemini 3; los modelos 2.x lo rechazan con un 400. */
+const FIRST_MODEL_GENERATION_WITH_THINKING_LEVEL = 3;
+
+function supportsThinkingLevel(model: string): boolean {
+  const generation = Number(model.match(/^gemini-(\d+)/)?.[1]);
+  return generation >= FIRST_MODEL_GENERATION_WITH_THINKING_LEVEL;
+}
+
+/** Nivel de razonamiento solo si el modelo lo soporta; si no, el modelo usa su valor por defecto. */
+function buildThinkingConfig(model: string, thinkingLevel: ThinkingLevel) {
+  return supportsThinkingLevel(model) ? { thinkingConfig: { thinkingLevel } } : {};
+}
+
 interface GeminiExtractorConfig {
   apiKey: string;
   model: string;
@@ -71,7 +84,9 @@ export function createGeminiExtractor({
   });
 
   return {
-    providerName: `gemini (${model}, thinking ${thinkingLevel})`,
+    providerName: supportsThinkingLevel(model)
+      ? `gemini (${model}, thinking ${thinkingLevel})`
+      : `gemini (${model})`,
 
     async extractReceipt(image: ReceiptImage) {
       const response = await client.models.generateContent({
@@ -89,7 +104,7 @@ export function createGeminiExtractor({
           systemInstruction: EXTRACTION_SYSTEM_PROMPT,
           responseMimeType: "application/json",
           responseJsonSchema: RECEIPT_JSON_SCHEMA,
-          thinkingConfig: { thinkingLevel },
+          ...buildThinkingConfig(model, thinkingLevel),
         },
       });
       return parseReceiptJson(response.text);
