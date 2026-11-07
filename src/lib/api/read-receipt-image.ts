@@ -1,5 +1,9 @@
 import { isSupportedImageMimeType, type ReceiptImage } from "@/lib/extraction/receipt-extractor";
-import { MAX_RECEIPT_IMAGE_BYTES, RECEIPT_IMAGE_FIELD } from "./analyze-receipt-contract";
+import {
+  MAX_RECEIPT_IMAGE_BYTES,
+  MAX_RECEIPT_IMAGES,
+  RECEIPT_IMAGE_FIELD,
+} from "./analyze-receipt-contract";
 
 /** La solicitud del cliente es inválida (se responde 400). */
 export class InvalidRequestError extends Error {
@@ -9,15 +13,18 @@ export class InvalidRequestError extends Error {
   }
 }
 
-async function readImageFile(request: Request): Promise<File> {
+async function readImageFiles(request: Request): Promise<File[]> {
   const formData = await request.formData().catch(() => {
-    throw new InvalidRequestError("La solicitud debe enviarse como formulario con una imagen.");
+    throw new InvalidRequestError("La solicitud debe enviarse como formulario con imágenes.");
   });
-  const file = formData.get(RECEIPT_IMAGE_FIELD);
-  if (!(file instanceof File)) {
+  const files = formData.getAll(RECEIPT_IMAGE_FIELD).filter((entry) => entry instanceof File);
+  if (files.length === 0) {
     throw new InvalidRequestError(`Falta la imagen en el campo "${RECEIPT_IMAGE_FIELD}".`);
   }
-  return file;
+  if (files.length > MAX_RECEIPT_IMAGES) {
+    throw new InvalidRequestError(`Máximo ${MAX_RECEIPT_IMAGES} fotos por boleta.`);
+  }
+  return files;
 }
 
 function assertValidImage(file: File): asserts file is File & { type: ReceiptImage["mimeType"] } {
@@ -29,10 +36,14 @@ function assertValidImage(file: File): asserts file is File & { type: ReceiptIma
   }
 }
 
-/** Lee y valida la imagen de la boleta desde un request multipart. */
-export async function readReceiptImage(request: Request): Promise<ReceiptImage> {
-  const file = await readImageFile(request);
+async function toReceiptImage(file: File): Promise<ReceiptImage> {
   assertValidImage(file);
   const base64Data = Buffer.from(await file.arrayBuffer()).toString("base64");
   return { base64Data, mimeType: file.type };
+}
+
+/** Lee y valida las fotos de la boleta (en el orden en que se enviaron) desde un multipart. */
+export async function readReceiptImages(request: Request): Promise<ReceiptImage[]> {
+  const files = await readImageFiles(request);
+  return Promise.all(files.map(toReceiptImage));
 }

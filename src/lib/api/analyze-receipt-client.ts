@@ -7,10 +7,12 @@ import {
 
 const NETWORK_ERROR_MESSAGE = "No hay conexión. Revisa internet e intenta de nuevo.";
 
-/** Envía la imagen de la boleta al backend y devuelve la boleta transcrita. */
-export async function requestReceiptAnalysis(image: Blob): Promise<AnalyzeReceiptSuccess> {
+/** Envía las fotos de la boleta (en orden) al backend y devuelve la boleta transcrita. */
+export async function requestReceiptAnalysis(images: Blob[]): Promise<AnalyzeReceiptSuccess> {
   const formData = new FormData();
-  formData.append(RECEIPT_IMAGE_FIELD, image, "boleta.jpg");
+  images.forEach((image, index) => {
+    formData.append(RECEIPT_IMAGE_FIELD, image, `boleta-${index + 1}.jpg`);
+  });
 
   const response = await fetch(ANALYZE_RECEIPT_ENDPOINT, { method: "POST", body: formData }).catch(
     () => {

@@ -1,7 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
 import { receiptSchema } from "@/lib/receipt/receipt-schema";
-import { EXTRACTION_SYSTEM_PROMPT, EXTRACTION_USER_PROMPT } from "../extraction-prompt";
+import { EXTRACTION_SYSTEM_PROMPT, buildExtractionUserPrompt } from "../extraction-prompt";
 import {
   ReceiptExtractionError,
   type ReceiptExtractor,
@@ -41,7 +41,7 @@ export function createClaudeExtractor({ apiKey, model }: ClaudeExtractorConfig):
   return {
     providerName: `claude (${model})`,
 
-    async extractReceipt(image: ReceiptImage) {
+    async extractReceipt(images: ReceiptImage[]) {
       const response = await client.beta.messages.parse({
         model,
         max_tokens: MAX_OUTPUT_TOKENS,
@@ -52,11 +52,15 @@ export function createClaudeExtractor({ apiKey, model }: ClaudeExtractorConfig):
           {
             role: "user",
             content: [
-              {
-                type: "image",
-                source: { type: "base64", media_type: image.mimeType, data: image.base64Data },
-              },
-              { type: "text", text: EXTRACTION_USER_PROMPT },
+              ...images.map((image) => ({
+                type: "image" as const,
+                source: {
+                  type: "base64" as const,
+                  media_type: image.mimeType,
+                  data: image.base64Data,
+                },
+              })),
+              { type: "text", text: buildExtractionUserPrompt(images.length) },
             ],
           },
         ],

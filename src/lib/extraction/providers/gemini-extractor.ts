@@ -6,7 +6,7 @@ import {
 } from "@google/genai";
 import { z } from "zod";
 import { receiptSchema } from "@/lib/receipt/receipt-schema";
-import { EXTRACTION_SYSTEM_PROMPT, EXTRACTION_USER_PROMPT } from "../extraction-prompt";
+import { EXTRACTION_SYSTEM_PROMPT, buildExtractionUserPrompt } from "../extraction-prompt";
 import {
   ReceiptExtractionError,
   type ReceiptExtractor,
@@ -100,15 +100,17 @@ export function createGeminiExtractor({
       ? `gemini (${model}, thinking ${thinkingLevel})`
       : `gemini (${model})`,
 
-    async extractReceipt(image: ReceiptImage) {
+    async extractReceipt(images: ReceiptImage[]) {
       const response = await client.models.generateContent({
         model,
         contents: [
           {
             role: "user",
             parts: [
-              createPartFromBase64(image.base64Data, image.mimeType, RECEIPT_IMAGE_RESOLUTION),
-              { text: EXTRACTION_USER_PROMPT },
+              ...images.map((image) =>
+                createPartFromBase64(image.base64Data, image.mimeType, RECEIPT_IMAGE_RESOLUTION),
+              ),
+              { text: buildExtractionUserPrompt(images.length) },
             ],
           },
         ],

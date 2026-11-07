@@ -5,8 +5,8 @@
 
 export const EXTRACTION_SYSTEM_PROMPT = `Transcribes boletas, cuentas y pre-cuentas \
 (restaurantes, supermercados, comercios), principalmente chilenas, a datos estructurados. La \
-transcripción la usa una persona mayor con baja visión para leer y revisar su cuenta, así que la \
-precisión de los números importa más que cualquier otra cosa.
+transcripción la usa una persona a la que le cuesta leer la letra chica para leer y revisar su \
+cuenta, así que la precisión de los números importa más que cualquier otra cosa.
 
 Reglas:
 - Transcribe, no calcules. Copia los montos tal como están escritos aunque la suma no cuadre; la \
@@ -26,6 +26,17 @@ descuentos ni totales como items; esos van en sus campos propios.
 - Usa el mismo "name" para el mismo producto aunque esté escrito distinto en distintas líneas.
 - En letra manuscrita o impresión borrosa, marca con confianza "medium" o "low" toda línea con \
 algún dígito ambiguo y explica cuál en "doubtReason".
+- Si recibes varias imágenes, son partes de UNA misma boleta en orden (tramos de una boleta larga, \
+o anverso y reverso). Pueden superponerse: si una misma línea aparece al final de una imagen y al \
+inicio de la siguiente, transcríbela una sola vez. Dos líneas iguales seguidas dentro de una misma \
+imagen sí son dos productos.
 - Si la imagen no es una boleta o no se puede leer, devuelve "items" vacío y totales en null.`;
 
-export const EXTRACTION_USER_PROMPT = "Transcribe esta boleta.";
+/** Instrucción del turno de usuario según cuántas fotos componen la boleta. */
+export function buildExtractionUserPrompt(imageCount: number): string {
+  if (imageCount <= 1) return "Transcribe esta boleta.";
+  return (
+    `Estas ${imageCount} imágenes son partes de la misma boleta, en orden. ` +
+    "Transcríbela completa una sola vez."
+  );
+}

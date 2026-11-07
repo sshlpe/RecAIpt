@@ -6,23 +6,26 @@ import { ImagePlusIcon } from "./ui/icons";
 
 interface CaptureReceiptButtonProps {
   label: string;
-  onPhotoSelected: (photo: File) => void;
+  onPhotosSelected: (photos: File[]) => void;
   variant?: ActionButtonVariant;
   /** Botón redondo solo con ícono; `label` queda como nombre accesible y tooltip. */
   iconOnly?: boolean;
 }
 
-/** Abre directamente la cámara trasera del teléfono (en escritorio, el selector de archivos). */
+/**
+ * Abre directamente la cámara trasera del teléfono. En escritorio abre el selector de archivos,
+ * donde se pueden elegir varias fotos a la vez.
+ */
 export function CaptureReceiptButton({
   label,
-  onPhotoSelected,
+  onPhotosSelected,
   variant,
   iconOnly = false,
 }: CaptureReceiptButtonProps) {
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
-    const photo = event.target.files?.[0];
+    const photos = Array.from(event.target.files ?? []);
     event.target.value = "";
-    if (photo) onPhotoSelected(photo);
+    if (photos.length > 0) onPhotosSelected(photos);
   }
 
   return (
@@ -36,6 +39,7 @@ export function CaptureReceiptButton({
         type="file"
         accept="image/*"
         capture="environment"
+        multiple
         className="sr-only"
         onChange={handleChange}
       />

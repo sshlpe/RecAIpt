@@ -30,14 +30,14 @@ const ITEM_VIEW_OPTIONS: { value: ItemView; label: string }[] = [
 
 interface ReceiptResultProps {
   receipt: Receipt;
-  photoUrl: string;
-  onNewPhoto: (photo: File) => void;
+  photoUrls: string[];
+  onNewReceipt: (photos: File[]) => void;
 }
 
 export function ReceiptResult({
   receipt: extractedReceipt,
-  photoUrl,
-  onNewPhoto,
+  photoUrls,
+  onNewReceipt,
 }: ReceiptResultProps) {
   const { receipt, actions } = useEditableReceipt(extractedReceipt);
   const summary = useMemo(() => summarizeReceipt(receipt), [receipt]);
@@ -104,7 +104,7 @@ export function ReceiptResult({
           label="Fotografiar otra boleta"
           variant="secondary"
           iconOnly
-          onPhotoSelected={onNewPhoto}
+          onPhotosSelected={onNewReceipt}
         />
       </div>
       <TotalBar summary={summary} onOpenReview={() => setSheet({ kind: "review" })} />
@@ -112,7 +112,7 @@ export function ReceiptResult({
         sheet={sheet}
         onSheetChange={setSheet}
         receipt={receipt}
-        photoUrl={photoUrl}
+        photoUrls={photoUrls}
         summary={summary}
         actions={actions}
         itemHandlers={itemHandlers}

@@ -8,7 +8,7 @@ import type { ItemActionHandlers } from "./item-actions";
 import { ItemDetailsPanel } from "./item-details-panel";
 import { ItemEditForm } from "./item-edit-form";
 import { MergeGroupPicker } from "./merge-group-picker";
-import { OriginalPhoto } from "./original-photo";
+import { OriginalPhotos } from "./original-photo";
 import { QuickAmountForm } from "./quick-amount-form";
 import { ReviewPanel } from "./review-panel";
 import { TotalsEditForm } from "./totals-edit-form";
@@ -42,7 +42,7 @@ interface ReceiptSheetsProps {
   sheet: ActiveSheet;
   onSheetChange: (sheet: ActiveSheet) => void;
   receipt: EditableReceipt;
-  photoUrl: string;
+  photoUrls: string[];
   summary: ReceiptSummary;
   actions: EditableReceiptActions;
   itemHandlers: ItemActionHandlers;
@@ -52,7 +52,7 @@ function SheetContent({
   sheet,
   onSheetChange,
   receipt,
-  photoUrl,
+  photoUrls,
   summary,
   actions,
   itemHandlers,
@@ -129,7 +129,7 @@ function SheetContent({
         />
       );
     case "photo":
-      return <OriginalPhoto photoUrl={photoUrl} />;
+      return <OriginalPhotos photoUrls={photoUrls} />;
     default:
       return null;
   }

@@ -8,10 +8,14 @@ export interface ReceiptImage {
   mimeType: SupportedImageMimeType;
 }
 
-/** Contrato que cumple cada proveedor de LLM: imagen de boleta -> Receipt validado. */
+/**
+ * Contrato que cumple cada proveedor de LLM: fotos de UNA boleta (en orden) -> Receipt validado.
+ * Todas las fotos van en una sola llamada para que el modelo descarte las líneas repetidas
+ * por superposición.
+ */
 export interface ReceiptExtractor {
   readonly providerName: string;
-  extractReceipt(image: ReceiptImage): Promise<Receipt>;
+  extractReceipt(images: ReceiptImage[]): Promise<Receipt>;
 }
 
 /** El modelo respondió, pero no se pudo obtener una boleta válida de su respuesta. */

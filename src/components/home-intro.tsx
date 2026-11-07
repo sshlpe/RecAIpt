@@ -5,7 +5,7 @@ import { ReceiptLine, ReceiptPaper } from "./ui/receipt-paper";
 const WHAT_IT_DOES = ["Letra grande", "Lo repetido, agrupado", "La suma, revisada"];
 
 /** Pantalla inicial: una boleta que explica la app y el botón para fotografiar la propia. */
-export function HomeIntro({ onPhotoSelected }: { onPhotoSelected: (photo: File) => void }) {
+export function HomeIntro({ onPhotosSelected }: { onPhotosSelected: (photos: File[]) => void }) {
   return (
     <div className="space-y-6">
       <ReceiptPaper>
@@ -18,9 +18,9 @@ export function HomeIntro({ onPhotoSelected }: { onPhotoSelected: (photo: File) 
           ))}
         </ul>
       </ReceiptPaper>
-      <CaptureReceiptButton label="Fotografiar boleta" onPhotoSelected={onPhotoSelected} />
+      <CaptureReceiptButton label="Fotografiar boleta" onPhotosSelected={onPhotosSelected} />
       <p className="text-center text-base text-muted">
-        Con buena luz y la boleta entera en la foto.
+        Con buena luz. Si es larga o tiene algo atrás, después puedes agregar más fotos.
       </p>
     </div>
   );
