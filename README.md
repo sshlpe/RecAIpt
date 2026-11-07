@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RecAIpt
 
-## Getting Started
+Saca una foto a una boleta y léela en letra grande, con los productos repetidos agrupados
+y la suma verificada. Pensada para personas con baja visión que hoy le sacan foto a la cuenta
+y le hacen zoom para revisarla.
 
-First, run the development server:
+- **Lectura**: la boleta se reescribe en letra grande, y se puede leer en voz alta.
+- **Agrupación**: "1 coca, 1 pan, 1 coca, 1 cerveza, 1 coca" → `3 × Coca-Cola`.
+- **Verificación**: suma los productos y la compara con el total escrito (útil sobre todo en
+  boletas escritas a mano). Nunca afirma un cobro de más: una diferencia puede ser un error
+  de lectura de la foto.
+- **Correcciones**: si la IA lee mal un monto o un nombre, se corrige en la app y el total
+  se recalcula.
+
+Es un proyecto personal sin fines de lucro. Aportes y forks son bienvenidos.
+
+## Cómo funciona
+
+1. La foto se reduce en el teléfono y se envía al servidor.
+2. Una sola llamada a un modelo de visión (Gemini o Claude) **transcribe** la boleta a un JSON
+   con schema fijo (`src/lib/receipt/receipt-schema.ts`).
+3. Agrupar, sumar y verificar es **código determinista**, no la IA
+   (`src/lib/receipt/`). El modelo solo transcribe; nunca suma.
+
+## Correr localmente
+
+Requiere Node 22 (ver `.nvmrc`; con [fnm](https://github.com/Schniz/fnm): `fnm use`).
 
 ```bash
+npm install
+cp .env.example .env.local   # pega tu API key
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+La key gratuita de Gemini se obtiene en [Google AI Studio](https://aistudio.google.com/apikey).
+Para usar Claude: `LLM_PROVIDER=claude` y `ANTHROPIC_API_KEY` en `.env.local`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Para probar desde el teléfono, abre la URL de "Network" que muestra `npm run dev`
+(mismo Wi-Fi o hotspot).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Contribuir
 
-## Learn More
+Las convenciones del código están en [`CLAUDE.md`](CLAUDE.md): código modular y reutilizable,
+máximo 400 líneas por archivo, sin lógica duplicada. Antes de abrir un PR:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run check   # tipos + lint + duplicados
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Licencia
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+[MIT](LICENSE)

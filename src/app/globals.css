@@ -1,26 +1,70 @@
 @import "tailwindcss";
 
+/* Tokens pensados para baja visión: alto contraste y letra base grande. */
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #111111;
+  --muted: #4a4a4a;
+  --surface: #f2f2f2;
+  --border: #1f1f1f;
+  --accent: #0b4fd6;
+  --accent-foreground: #ffffff;
+  --success: #0f6b2f;
+  --success-surface: #e3f5e9;
+  --warning: #8a4b00;
+  --warning-surface: #fff1db;
+  --info: #1f3d7a;
+  --info-surface: #e6edfb;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Azul marino: menos duro que el negro puro, mantiene alto contraste con texto claro. */
+    --background: #0b1a33;
+    --foreground: #f2f5fb;
+    --muted: #a9b6cf;
+    --surface: #17294a;
+    --border: #c7d2e8;
+    --accent: #7fb0ff;
+    --accent-foreground: #0b1a33;
+    --success: #7be29d;
+    --success-surface: #10331f;
+    --warning: #ffc266;
+    --warning-surface: #3a2a10;
+    --info: #a9c4ff;
+    --info-surface: #142c55;
+  }
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-muted: var(--muted);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-success: var(--success);
+  --color-success-surface: var(--success-surface);
+  --color-warning: var(--warning);
+  --color-warning-surface: var(--warning-surface);
+  --color-info: var(--info);
+  --color-info-surface: var(--info-surface);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  /* Respeta el tamaño de letra que el usuario configuró en su teléfono. */
+  font-size: 100%;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  line-height: 1.4;
 }
