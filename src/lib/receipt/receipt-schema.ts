@@ -37,9 +37,13 @@ export const receiptItemSchema = z.object({
     .number()
     .describe('Cantidad, con decimales si es por peso ("1,45" -> 1.45). Si no se indica, 1.'),
   unitPrice: optionalAmountField(
-    "Precio unitario, solo si aparece escrito en la boleta. Nunca lo calcules dividiendo el total.",
+    "Precio unitario, solo si aparece escrito en la boleta. Nunca lo calcules dividiendo el total. " +
+      "Si la línea tiene su propio descuento (precio, DESCUENTO y un total ya rebajado), null.",
   ),
-  lineTotal: amountField("Total de la línea, tal como está escrito."),
+  lineTotal: amountField(
+    "Total de la línea, tal como está escrito. Si la línea tiene un descuento propio, el total " +
+      "ya rebajado.",
+  ),
   confidence: z
     .enum(CONFIDENCE_LEVELS)
     .describe("Qué tan seguro estás de haber leído bien los números y el nombre de esta línea."),
@@ -78,7 +82,10 @@ export const receiptSchema = z.object({
       'Consumo. Si la línea "Subtotal" ya incluye impuestos agregados aparte, NO es esta. ' +
       'Tampoco la base imponible, el neto ni montos "sin IVA".',
   ),
-  printedDiscount: optionalAmountField("Descuento total escrito, como número positivo."),
+  printedDiscount: optionalAmountField(
+    "Descuento al pie que se resta DESPUÉS de sumar las líneas, como número positivo. Los " +
+      "descuentos por línea que ya están restados en el total de cada línea NO van aquí.",
+  ),
   printedTaxes: optionalAmountField(
     "Impuestos que se SUMAN APARTE al consumo (ej: IPC o impuesto al consumo, IVA agregado " +
       "al final, cargo por servicio obligatorio). Si hay varios, súmalos. NO incluyas impuestos " +

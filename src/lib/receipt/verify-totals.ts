@@ -25,6 +25,10 @@ export interface ReceiptVerification {
   subtotalCheck: AmountComparison | null;
   totalCheck: AmountComparison | null;
   tipPercentage: number | null;
+  /** Descuento que se resta: 0 si el escrito ya venía restado en las líneas. */
+  discount: number;
+  /** Descuento escrito que ya estaba restado en los totales de línea (no se resta); si no, null. */
+  discountInLines: number | null;
   doubtfulItemIndexes: number[];
   isConsistent: boolean;
 }
@@ -74,9 +78,34 @@ function closestTo(candidates: number[], target: number): number {
   );
 }
 
+/**
+ * El descuento escrito ya está restado en los totales de línea (ej: cada producto con su
+ * "DESCUENTO" y el total rebajado): el total escrito cuadra con los productos sin restarlo y no
+ * cuadra restándolo. Restarlo de nuevo lo contaría dos veces.
+ */
+export function isDiscountInLines(receipt: Receipt, itemsSum: number): boolean {
+  const discount = receipt.printedDiscount ?? 0;
+  const { printedTotal } = receipt;
+  if (discount <= 0 || printedTotal === null) return false;
+  const withoutDiscount = [0, receipt.printedTip ?? 0].map(
+    (tip) => itemsSum + (receipt.printedTaxes ?? 0) + tip,
+  );
+  const matchesTotal = (amount: number) =>
+    compareAmounts(amount, printedTotal, receipt.currency).matches;
+  return (
+    withoutDiscount.some(matchesTotal) &&
+    !withoutDiscount.some((amount) => matchesTotal(amount - discount))
+  );
+}
+
+/** El descuento que de verdad se resta (0 si ya venía dentro de las líneas). */
+export function appliedDiscount(receipt: Receipt, itemsSum: number): number {
+  return isDiscountInLines(receipt, itemsSum) ? 0 : (receipt.printedDiscount ?? 0);
+}
+
 /** Productos − descuento + impuestos agregados aparte: lo que se cobra antes de la propina. */
 export function amountBeforeTip(receipt: Receipt, itemsSum: number): number {
-  return itemsSum - (receipt.printedDiscount ?? 0) + (receipt.printedTaxes ?? 0);
+  return itemsSum - appliedDiscount(receipt, itemsSum) + (receipt.printedTaxes ?? 0);
 }
 
 /**
@@ -126,6 +155,8 @@ export function verifyReceipt(receipt: Receipt): ReceiptVerification {
     subtotalCheck,
     totalCheck,
     tipPercentage: calculateTipPercentage(receipt, itemsSum),
+    discount: appliedDiscount(receipt, itemsSum),
+    discountInLines: isDiscountInLines(receipt, itemsSum) ? receipt.printedDiscount : null,
     doubtfulItemIndexes: findDoubtfulItemIndexes(receipt.items),
     isConsistent:
       lineMismatches.length === 0 &&

@@ -82,7 +82,7 @@ export function summarizeReceipt(receipt: EditableReceipt): ReceiptSummary {
   const issuesByItemId = findItemIssues(receipt, verification, formatAmount);
   const charges: SplitCharges = {
     itemsSum: verification.itemsSum,
-    discount: receipt.printedDiscount ?? 0,
+    discount: verification.discount,
     taxes: receipt.printedTaxes ?? 0,
     tip: effectiveTip(receipt, verification.itemsSum, currency),
   };

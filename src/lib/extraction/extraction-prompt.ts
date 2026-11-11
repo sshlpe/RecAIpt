@@ -20,6 +20,10 @@ o "Consumo". Si la boleta llama "Subtotal" a productos + impuestos, esa no es. L
 el neto y el IVA tampoco.
 - Impuestos que se suman aparte al consumo (IPC, impuesto al consumo, IVA agregado al final) van \
 en "printedTaxes". Los que ya vienen incluidos en los precios no se ponen.
+- Descuentos por línea: si un producto muestra su precio, una línea "DESCUENTO -3,00" y un total \
+ya rebajado, es UN item con "lineTotal" = el total rebajado y "unitPrice" = null. Ese descuento \
+ya está restado: no lo sumes en "printedDiscount", que es solo para un descuento al pie que se \
+resta después de sumar las líneas.
 - Una entrada en "items" por cada línea de producto cobrado. No incluyas subtotales, IVA, propina, \
 descuentos ni totales como items; esos van en sus campos propios.
 - "merchantName" y "purchaseDate" solo si están escritos en la boleta (en Chile la fecha suele ir \

@@ -38,6 +38,19 @@ function describeMismatches(verification: ReceiptVerification, format: AmountFor
   return details;
 }
 
+/** Si el descuento ya venía restado en cada producto, se dice: no desapareció, ya está aplicado. */
+function describeDiscountInLines(
+  verification: ReceiptVerification,
+  format: AmountFormatter,
+): string[] {
+  const { discountInLines } = verification;
+  if (discountInLines === null) return [];
+  return [
+    `El descuento de ${format(discountInLines)} ya viene restado en cada producto; ` +
+      "no se resta de nuevo.",
+  ];
+}
+
 function describeTip(verification: ReceiptVerification): string[] {
   if (verification.tipPercentage === null) return [];
   return [`La propina es el ${formatPercent(verification.tipPercentage)} de la cuenta.`];
@@ -94,6 +107,7 @@ export function describeVerification(
     title: "La suma cuadra",
     details: [
       `Total: ${format(verification.totalCheck.printed)}.`,
+      ...describeDiscountInLines(verification, format),
       ...describeTip(verification),
       ...describeDoubts(verification),
     ],
