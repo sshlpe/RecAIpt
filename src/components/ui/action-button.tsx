@@ -1,6 +1,7 @@
 import type { ButtonHTMLAttributes } from "react";
 
-export type ActionButtonVariant = "primary" | "secondary" | "positive" | "on-brand";
+export type ActionButtonVariant =
+  "primary" | "secondary" | "positive" | "danger" | "danger-outline" | "on-brand";
 export type ActionButtonSize = "large" | "compact" | "icon" | "icon-small";
 
 const BASE_CLASS =
@@ -22,6 +23,10 @@ const VARIANT_CLASS: Record<ActionButtonVariant, string> = {
   secondary: "border-2 border-border bg-background text-foreground",
   /** Acciones de agregar: verde, con el texto del color del fondo para mantener contraste. */
   positive: "bg-success text-background",
+  /** Confirmar algo que no se puede deshacer (borrar): rojo lleno. */
+  danger: "bg-danger text-background",
+  /** Ofrecer una acción destructiva antes de confirmarla: contorno rojo. */
+  "danger-outline": "border-2 border-danger bg-background text-danger",
   /** Sobre la barra teal de la marca: contorno y texto claros. */
   "on-brand": "border-2 border-brand-bar-foreground/70 text-brand-bar-foreground",
 };

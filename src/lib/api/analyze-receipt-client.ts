@@ -27,7 +27,7 @@ export async function requestReceiptAnalysis(images: Blob[]): Promise<AnalyzeRec
   return body;
 }
 
-/** Reduce las fotos en el teléfono y las envía a leer: lo que hace "leer" y "leer de nuevo". */
+/** Reduce las fotos en el teléfono y las envía a leer: lo que hace "leer" y "Reprocesar". */
 export async function readReceiptPhotos(photos: Blob[]): Promise<AnalyzeReceiptSuccess> {
   const resizedPhotos = await Promise.all(photos.map((photo) => resizeImageToJpeg(photo)));
   return requestReceiptAnalysis(resizedPhotos);

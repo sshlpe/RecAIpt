@@ -21,6 +21,8 @@
   --success-surface: #e3f5e9;
   --warning: #8a4b00;
   --warning-surface: #fff1db;
+  /* Acciones destructivas (borrar). */
+  --danger: #b3261e;
   --info: #1f3d7a;
   --info-surface: #e6edfb;
 }
@@ -39,6 +41,7 @@
     --success-surface: #10331f;
     --warning: #ffc266;
     --warning-surface: #3a2a10;
+    --danger: #ff8a80;
     --info: #a9c4ff;
     --info-surface: #142c55;
   }
@@ -56,6 +59,7 @@
   --color-success-surface: var(--success-surface);
   --color-warning: var(--warning);
   --color-warning-surface: var(--warning-surface);
+  --color-danger: var(--danger);
   --color-info: var(--info);
   --color-info-surface: var(--info-surface);
   --color-paper: var(--paper);

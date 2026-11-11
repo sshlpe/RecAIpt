@@ -8,7 +8,8 @@ import { hasReceiptInProgress, useActiveReceipt } from "./active-receipt-provide
 import { CaptureReceiptButton } from "./capture-receipt-button";
 import { actionButtonClassName } from "./ui/action-button";
 import { BottomSheet } from "./ui/bottom-sheet";
-import { MenuIcon } from "./ui/icons";
+import { IconButton } from "./ui/icon-button";
+import { HistoryIcon, MenuIcon } from "./ui/icons";
 
 /**
  * "Menú" de la barra superior: abre un panel con botones grandes (no un desplegable chico).
@@ -31,15 +32,13 @@ export function AppMenu() {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setIsOpen(true)}
+      <IconButton
+        icon={<MenuIcon />}
+        label="Menú"
+        variant="on-brand"
         aria-haspopup="dialog"
-        className={actionButtonClassName("on-brand", "compact")}
-      >
-        <MenuIcon />
-        Menú
-      </button>
+        onClick={() => setIsOpen(true)}
+      />
       <BottomSheet open={isOpen} title="Menú" onClose={close}>
         <nav aria-label="Menú" className="space-y-3">
           {(!isHome || inProgress) && (
@@ -56,6 +55,7 @@ export function AppMenu() {
               onClick={close}
               className={actionButtonClassName("secondary")}
             >
+              <HistoryIcon />
               Historial de boletas
             </Link>
           )}

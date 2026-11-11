@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { ActionButton } from "./action-button";
+import { ActionButton, type ActionButtonVariant } from "./action-button";
 
 interface ConfirmActionProps {
   label: string;
@@ -9,16 +9,23 @@ interface ConfirmActionProps {
   warning: string;
   /** Control que confirma (un botón, o el selector de fotos). Recibe cómo cerrar la pregunta. */
   renderConfirm: (close: () => void) => ReactNode;
+  /** Estilo del botón que ofrece la acción (ej: "danger-outline" para borrar). */
+  variant?: ActionButtonVariant;
 }
 
 /** Acción que no se puede deshacer: pide confirmación en la misma pantalla, sin diálogos. */
-export function ConfirmAction({ label, warning, renderConfirm }: ConfirmActionProps) {
+export function ConfirmAction({
+  label,
+  warning,
+  renderConfirm,
+  variant = "secondary",
+}: ConfirmActionProps) {
   const [isConfirming, setIsConfirming] = useState(false);
   const close = () => setIsConfirming(false);
 
   if (!isConfirming) {
     return (
-      <ActionButton variant="secondary" onClick={() => setIsConfirming(true)}>
+      <ActionButton variant={variant} onClick={() => setIsConfirming(true)}>
         {label}
       </ActionButton>
     );

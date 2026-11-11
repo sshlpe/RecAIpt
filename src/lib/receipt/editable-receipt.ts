@@ -203,7 +203,7 @@ export function updateReceiptInfo(receipt: EditableReceipt, info: ReceiptInfo): 
 }
 
 /**
- * "Volver a lo que leyó la IA": deshace las correcciones de lectura (productos y montos) pero
+ * "Restablecer": vuelve a lo que leyó la IA. Deshace las correcciones de lectura (productos y montos) pero
  * conserva lo que decidió el usuario y no es una lectura: nombre, fecha y propina elegida.
  */
 export function discardReadingCorrections(

@@ -8,7 +8,7 @@ import { ConfirmAction } from "./ui/confirm-action";
 import { NoticeBox } from "./ui/notice-box";
 
 interface ReceiptOptionsProps {
-  /** Fotos en memoria (lectura recién hecha). Sin ellas, "leer de nuevo" pide subirlas. */
+  /** Fotos en memoria (lectura recién hecha). Sin ellas, "Reprocesar" pide subirlas. */
   photos: File[];
   hasCorrections: boolean;
   rereadState: RereadState;
@@ -20,11 +20,11 @@ interface ReceiptOptionsProps {
 
 function RereadStatus({ state }: { state: RereadState }) {
   if (state.status === "reading") {
-    return <NoticeBox tone="info" title="Leyendo de nuevo la boleta…" />;
+    return <NoticeBox tone="info" title="Reprocesando la boleta…" />;
   }
   if (state.status === "error") {
     return (
-      <NoticeBox tone="warning" title="No se pudo leer de nuevo">
+      <NoticeBox tone="warning" title="No se pudo reprocesar">
         <p>{state.message}</p>
       </NoticeBox>
     );
@@ -33,7 +33,8 @@ function RereadStatus({ state }: { state: RereadState }) {
 }
 
 /**
- * Acciones sobre ESTA boleta (no crean otra): leerla de nuevo con la IA o volver a lo que leyó.
+ * Acciones sobre ESTA boleta (no crean otra): "Reprocesar" (otra lectura de la IA) y
+ * "Restablecer" (volver a lo que leyó). Términos comunes en apps; el aviso explica el efecto.
  * Las dos descartan correcciones, así que piden confirmación.
  */
 export function ReceiptOptions(props: ReceiptOptionsProps) {
@@ -48,16 +49,16 @@ export function ReceiptOptions(props: ReceiptOptionsProps) {
       <RereadStatus state={rereadState} />
       {!isReading && (
         <ConfirmAction
-          label="Leer de nuevo con la IA"
+          label="Reprocesar"
           warning={
             photos.length > 0
-              ? "Se vuelve a leer la foto. Se pierden las correcciones y la división de esta boleta."
-              : "Sube de nuevo la foto de esta boleta. Se pierden sus correcciones y su división."
+              ? "La IA vuelve a leer la foto. Se pierden las correcciones y la división de esta boleta."
+              : "Sube de nuevo la foto y la IA la vuelve a leer. Se pierden las correcciones y la división de esta boleta."
           }
           renderConfirm={(close) =>
             photos.length > 0 ? (
               <ActionButton onClick={() => (onReread(photos), close())}>
-                Sí, leer de nuevo
+                Sí, reprocesar
               </ActionButton>
             ) : (
               <CaptureReceiptButton
@@ -70,10 +71,12 @@ export function ReceiptOptions(props: ReceiptOptionsProps) {
       )}
       {hasCorrections && !isReading && (
         <ConfirmAction
-          label="Volver a lo que leyó la IA"
-          warning="Se pierden las correcciones de productos y montos. El nombre, la fecha, la propina y la división se mantienen."
+          label="Restablecer"
+          warning="Vuelve a lo que leyó la IA: se pierden las correcciones de productos y montos. El nombre, la fecha, la propina y la división se mantienen."
           renderConfirm={(close) => (
-            <ActionButton onClick={() => (onResetToOriginal(), close())}>Sí, volver</ActionButton>
+            <ActionButton onClick={() => (onResetToOriginal(), close())}>
+              Sí, restablecer
+            </ActionButton>
           )}
         />
       )}

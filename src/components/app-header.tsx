@@ -5,7 +5,7 @@ import { AppLogo } from "./ui/app-logo";
 export function AppHeader() {
   return (
     <header className="bg-brand-bar text-brand-bar-foreground">
-      <div className="mx-auto flex w-full max-w-xl items-center justify-between gap-3 px-4 py-2.5">
+      <div className="mx-auto flex w-full max-w-xl items-center justify-between gap-3 px-4 py-4">
         <AppLogo />
         <AppMenu />
       </div>

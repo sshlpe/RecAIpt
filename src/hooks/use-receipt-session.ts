@@ -15,7 +15,7 @@ import { useReceiptAutosave } from "./use-receipt-autosave";
 export type RereadState =
   { status: "idle" } | { status: "reading" } | { status: "error"; message: string };
 
-const UNKNOWN_ERROR_MESSAGE = "No se pudo leer de nuevo. Intenta otra vez.";
+const UNKNOWN_ERROR_MESSAGE = "No se pudo reprocesar. Intenta otra vez.";
 
 /**
  * Una boleta abierta (recién leída o del historial): lo que leyó la IA, las correcciones,
@@ -44,7 +44,7 @@ export function useReceiptSession(saved: SavedReceipt) {
     [replace, receipt, original],
   );
 
-  /** "Leer de nuevo": la lectura nueva pasa a ser la original de ESTA boleta (no crea otra). */
+  /** "Reprocesar": la lectura nueva pasa a ser la original de ESTA boleta (no crea otra). */
   const reread = useCallback(
     async (photos: Blob[]) => {
       setRereadState({ status: "reading" });

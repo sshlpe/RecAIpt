@@ -27,8 +27,13 @@ function DeleteReceiptAction({ onDelete }: { onDelete: () => void }) {
   return (
     <ConfirmAction
       label="Borrar esta boleta"
+      variant="danger-outline"
       warning="¿Borrar esta boleta del historial? No se puede deshacer."
-      renderConfirm={() => <ActionButton onClick={onDelete}>Sí, borrar</ActionButton>}
+      renderConfirm={() => (
+        <ActionButton variant="danger" onClick={onDelete}>
+          Sí, borrar
+        </ActionButton>
+      )}
     />
   );
 }
