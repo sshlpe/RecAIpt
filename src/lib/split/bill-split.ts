@@ -128,3 +128,12 @@ export function toggleSharedParty(
     : [...current, partyId];
   return withAllocation(split, productKey, { ...allocation, sharedBy });
 }
+
+/** Si se llegó a asignar algo: una división sin asignaciones no se muestra en el resumen. */
+export function isSplitInUse(split: BillSplit): boolean {
+  return Object.values(split.allocations).some(
+    (allocation) =>
+      (allocation.sharedBy?.length ?? 0) > 0 ||
+      Object.values(allocation.unitsByParty).some((units) => units > 0),
+  );
+}

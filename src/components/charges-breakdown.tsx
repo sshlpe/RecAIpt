@@ -1,3 +1,4 @@
+import { describeChargeLines } from "@/lib/receipt/charge-lines";
 import type { ReceiptSummary } from "@/lib/receipt/summarize-receipt";
 import { ReceiptLine, ReceiptPaper } from "./ui/receipt-paper";
 
@@ -8,11 +9,7 @@ import { ReceiptLine, ReceiptPaper } from "./ui/receipt-paper";
  */
 export function ChargesBreakdown({ summary }: { summary: ReceiptSummary }) {
   const { charges, payableTotal, formatAmount } = summary;
-  const extraLines = [
-    { label: "Descuento", amount: -charges.discount },
-    { label: "Impuestos aparte", amount: charges.taxes },
-    { label: "Propina", amount: charges.tip },
-  ].filter((line) => line.amount !== 0);
+  const extraLines = describeChargeLines(charges);
   if (extraLines.length === 0) return null;
 
   return (

@@ -1,3 +1,4 @@
+import { resizeImageToJpeg } from "@/lib/image/resize-image";
 import {
   ANALYZE_RECEIPT_ENDPOINT,
   RECEIPT_IMAGE_FIELD,
@@ -24,4 +25,10 @@ export async function requestReceiptAnalysis(images: Blob[]): Promise<AnalyzeRec
     throw new Error("error" in body ? body.error : `Error ${response.status}`);
   }
   return body;
+}
+
+/** Reduce las fotos en el teléfono y las envía a leer: lo que hace "leer" y "leer de nuevo". */
+export async function readReceiptPhotos(photos: Blob[]): Promise<AnalyzeReceiptSuccess> {
+  const resizedPhotos = await Promise.all(photos.map((photo) => resizeImageToJpeg(photo)));
+  return requestReceiptAnalysis(resizedPhotos);
 }

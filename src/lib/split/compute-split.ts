@@ -1,5 +1,5 @@
 import { getCurrencyDecimals, roundToCurrency } from "@/lib/format/currency";
-import { formatQuantity } from "@/lib/format/format-numbers";
+import { formatQuantityLabel } from "@/lib/format/format-numbers";
 import { distributeRounded } from "@/lib/math/distribute-rounded";
 import { sumBy } from "@/lib/math/sum-by";
 import { toGroupingKey, type ItemGroup } from "@/lib/receipt/group-items";
@@ -60,7 +60,7 @@ export function remainingUnits(group: ItemGroup, allocation: ProductAllocation):
 
 function describeUnits(group: ItemGroup, units: number): string {
   const shown = Number.isInteger(group.totalQuantity) ? units : group.totalQuantity;
-  return `${formatQuantity(shown)} × ${group.name}`;
+  return formatQuantityLabel(shown, group.name);
 }
 
 /** Lo que consumió un grupo de un producto (null si no le toca nada). */

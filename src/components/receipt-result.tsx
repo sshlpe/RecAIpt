@@ -1,21 +1,20 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { useBillSplit } from "@/hooks/use-bill-split";
-import { useEditableReceipt } from "@/hooks/use-editable-receipt";
-import type { Receipt } from "@/lib/receipt/receipt-schema";
-import { summarizeReceipt } from "@/lib/receipt/summarize-receipt";
+import { useState, type ReactNode } from "react";
+import type { ReceiptSession } from "@/hooks/use-receipt-session";
 import type { ItemActionHandlers } from "./item-actions";
 import { GroupedItemList, OriginalItemList } from "./item-lists";
 import { CaptureReceiptButton } from "./capture-receipt-button";
 import { ChargesBreakdown } from "./charges-breakdown";
+import { ReceiptHeader } from "./receipt-header";
+import { ReceiptOptions } from "./receipt-options";
 import { ReceiptSheets, type ActiveSheet } from "./receipt-sheets";
 import { SpeakButton } from "./speak-button";
 import { SplitView } from "./split/split-view";
 import { TipSelector } from "./tip-selector";
 import { TotalBar } from "./total-bar";
 import { IconButton } from "./ui/icon-button";
-import { ImageIcon, PlusIcon } from "./ui/icons";
+import { HistoryIcon, ImageIcon, PlusIcon } from "./ui/icons";
 import { SegmentedToggle } from "./ui/segmented-toggle";
 import { VerificationSummary } from "./verification-summary";
 
@@ -29,22 +28,23 @@ const ITEM_VIEW_OPTIONS: { value: ItemView; label: string }[] = [
 ];
 
 interface ReceiptResultProps {
-  receipt: Receipt;
+  /** Boleta abierta (recién leída o del historial); cada cambio se guarda solo. */
+  session: ReceiptSession;
+  /** Fotos de la lectura recién hecha; vacías en una boleta del historial (no se guardan). */
   photoUrls: string[];
-  onNewReceipt: (photos: File[]) => void;
+  photos: File[];
+  /** Solo en la lectura recién hecha: el historial tiene su propia navegación. */
+  onNewReceipt?: (photos: File[]) => void;
+  onShowHistory?: () => void;
+  /** Opciones extra al final (ej: borrar, en el historial). */
+  extraOptions?: ReactNode;
 }
 
-export function ReceiptResult({
-  receipt: extractedReceipt,
-  photoUrls,
-  onNewReceipt,
-}: ReceiptResultProps) {
-  const { receipt, actions } = useEditableReceipt(extractedReceipt);
-  const summary = useMemo(() => summarizeReceipt(receipt), [receipt]);
+export function ReceiptResult(props: ReceiptResultProps) {
+  const { session, photoUrls, photos, onNewReceipt, onShowHistory, extraOptions } = props;
+  const { receipt, actions, summary, billSplit } = session;
   const [itemView, setItemView] = useState<ItemView>("grouped");
   const [sheet, setSheet] = useState<ActiveSheet>(null);
-  // La división vive aquí (no en la vista) para no perderla al cambiar de pestaña.
-  const billSplit = useBillSplit();
 
   const itemHandlers: ItemActionHandlers = {
     onQuickEdit: (itemId) => setSheet({ kind: "quick-edit", itemId }),
@@ -61,6 +61,7 @@ export function ReceiptResult({
 
   return (
     <div className="space-y-6">
+      <ReceiptHeader info={receipt} readAt={session.readAt} onSave={actions.saveInfo} />
       {!hasItems && <VerificationSummary message={summary.message} />}
       {hasItems && (
         <>
@@ -77,7 +78,8 @@ export function ReceiptResult({
             printedTip={receipt.printedTip}
             addedTip={receipt.addedTip}
             tipAmount={summary.charges.tip}
-            tipBase={summary.charges.itemsSum - summary.charges.discount}
+            tipBase={summary.tipBase}
+            hasDiscount={summary.charges.discount > 0}
             currency={summary.currency}
             formatAmount={summary.formatAmount}
             onChange={actions.setTip}
@@ -95,18 +97,34 @@ export function ReceiptResult({
           variant="positive"
           onClick={() => setSheet({ kind: "add-item" })}
         />
-        <IconButton
-          icon={<ImageIcon />}
-          label="Ver foto original"
-          onClick={() => setSheet({ kind: "photo" })}
-        />
-        <CaptureReceiptButton
-          label="Fotografiar otra boleta"
-          variant="secondary"
-          iconOnly
-          onPhotosSelected={onNewReceipt}
-        />
+        {photoUrls.length > 0 && (
+          <IconButton
+            icon={<ImageIcon />}
+            label="Ver foto original"
+            onClick={() => setSheet({ kind: "photo" })}
+          />
+        )}
+        {onShowHistory && (
+          <IconButton icon={<HistoryIcon />} label="Boletas anteriores" onClick={onShowHistory} />
+        )}
+        {onNewReceipt && (
+          <CaptureReceiptButton
+            label="Nueva boleta (otro gasto)"
+            variant="secondary"
+            iconOnly
+            onPhotosSelected={onNewReceipt}
+          />
+        )}
       </div>
+      <ReceiptOptions
+        photos={photos}
+        hasCorrections={session.corrections.length > 0}
+        rereadState={session.rereadState}
+        onReread={session.reread}
+        onResetToOriginal={session.resetToOriginal}
+      >
+        {extraOptions}
+      </ReceiptOptions>
       <TotalBar summary={summary} onOpenReview={() => setSheet({ kind: "review" })} />
       <ReceiptSheets
         sheet={sheet}

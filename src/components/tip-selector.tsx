@@ -31,8 +31,10 @@ interface TipSelectorProps {
   addedTip: TipChoice | null;
   /** Monto de propina que se está cobrando. */
   tipAmount: number;
-  /** Consumo menos descuentos: sobre esto se calculan los porcentajes. */
+  /** Consumo antes del descuento: sobre esto se calculan los porcentajes. */
   tipBase: number;
+  /** Con descuento se aclara la base, porque no coincide con el total de la boleta. */
+  hasDiscount: boolean;
   currency: string;
   formatAmount: AmountFormatter;
   onChange: (tip: TipChoice | null) => void;
@@ -53,7 +55,16 @@ function toOption(tip: TipChoice | null, hasPrintedTip: boolean): TipOption {
  * por si la IA la leyó mal o se quiere dar otra. "Otro" parte con el monto sugerido para editarlo.
  */
 export function TipSelector(props: TipSelectorProps) {
-  const { printedTip, addedTip, tipAmount, tipBase, currency, formatAmount, onChange } = props;
+  const {
+    printedTip,
+    addedTip,
+    tipAmount,
+    tipBase,
+    hasDiscount,
+    currency,
+    formatAmount,
+    onChange,
+  } = props;
   const hasPrintedTip = printedTip !== null;
   const customStart: TipChoice = hasPrintedTip
     ? { kind: "amount", amount: printedTip }
@@ -93,6 +104,12 @@ export function TipSelector(props: TipSelectorProps) {
           {selected === "printed" ? "Propina sugerida en la boleta" : "Se suma"}:{" "}
           {formatAmount(tipAmount)}.
           {selected === "printed" && " Si se leyó mal, elige Otro y corrígela."}
+        </p>
+      )}
+      {hasDiscount && (tipAmount > 0 || isCustom) && (
+        <p className="text-base text-muted">
+          Los porcentajes se calculan sobre el consumo antes del descuento ({formatAmount(tipBase)}
+          ), como lo hacen los locales.
         </p>
       )}
     </section>

@@ -1,4 +1,4 @@
-import { formatQuantity } from "@/lib/format/format-numbers";
+import { formatQuantityLabel } from "@/lib/format/format-numbers";
 import { hasMergedItems, type EditableItem } from "@/lib/receipt/editable-receipt";
 import type { ItemGroup } from "@/lib/receipt/group-items";
 import { findInterpretedText } from "@/lib/receipt/item-interpretation";
@@ -45,7 +45,7 @@ export function GroupedItemList({
   return (
     <ul>
       {groups.map((group) => {
-        const label = `${formatQuantity(group.totalQuantity)} × ${group.name}`;
+        const label = formatQuantityLabel(group.totalQuantity, group.name);
         return (
           <MoneyRow
             key={group.items[0].id}

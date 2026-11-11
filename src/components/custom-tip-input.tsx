@@ -29,7 +29,7 @@ const PERCENT_DECIMALS = 2;
 
 interface CustomTipInputProps {
   initial: TipChoice | null;
-  /** Consumo menos descuentos: sobre esto se calcula el porcentaje. */
+  /** Consumo antes del descuento: sobre esto se calcula el porcentaje. */
   base: number;
   currency: string;
   formatAmount: AmountFormatter;

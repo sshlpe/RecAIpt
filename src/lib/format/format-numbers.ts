@@ -8,6 +8,11 @@ export function formatQuantity(quantity: number): string {
   return quantity.toLocaleString(NUMBER_LOCALE, { maximumFractionDigits: QUANTITY_DECIMALS });
 }
 
+/** Producto con su cantidad: "2 × Lomo a lo pobre", "1,45 × Palta". */
+export function formatQuantityLabel(quantity: number, name: string): string {
+  return `${formatQuantity(quantity)} × ${name}`;
+}
+
 /** 5.8 -> "5,8%", 10 -> "10%". */
 export function formatPercent(percent: number): string {
   return `${percent.toLocaleString(NUMBER_LOCALE, { maximumFractionDigits: 1 })}%`;

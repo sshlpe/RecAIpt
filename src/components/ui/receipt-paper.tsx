@@ -8,15 +8,19 @@ export function ReceiptPaper({ children }: { children: ReactNode }) {
 interface ReceiptLineProps {
   label: string;
   value: string;
+  /** Línea destacada (ej: el total final). */
+  strong?: boolean;
 }
 
 /** Línea "impresa" con puntos guía, como en una boleta: "Letra grande ........ ✓". */
-export function ReceiptLine({ label, value }: ReceiptLineProps) {
+export function ReceiptLine({ label, value, strong = false }: ReceiptLineProps) {
   return (
-    <li className="flex items-baseline gap-2 font-mono text-lg">
-      <span>{label}</span>
+    <li
+      className={`flex items-baseline gap-2 font-mono ${strong ? "text-xl font-extrabold" : "text-lg"}`}
+    >
+      <span className="min-w-0 break-words">{label}</span>
       <span aria-hidden className="mb-1 flex-1 border-b-2 border-dotted border-ink-muted" />
-      <span className="font-bold">{value}</span>
+      <span className="shrink-0 font-bold">{value}</span>
     </li>
   );
 }

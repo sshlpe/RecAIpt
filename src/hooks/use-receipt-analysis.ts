@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MAX_RECEIPT_IMAGES } from "@/lib/api/analyze-receipt-contract";
-import { requestReceiptAnalysis } from "@/lib/api/analyze-receipt-client";
-import { resizeImageToJpeg } from "@/lib/image/resize-image";
-import type { Receipt } from "@/lib/receipt/receipt-schema";
+import { readReceiptPhotos } from "@/lib/api/analyze-receipt-client";
+import { toErrorMessage } from "@/lib/errors/error-message";
+import { createSavedReceipt, type SavedReceipt } from "@/lib/history/saved-receipt";
 
 /** Foto tomada por el usuario y la URL local para mostrarla. */
 export interface CapturedPhoto {
@@ -15,14 +15,10 @@ export interface CapturedPhoto {
 export type ReceiptAnalysisState =
   | { status: "capturing" }
   | { status: "processing" }
-  | { status: "done"; receipt: Receipt; providerName: string }
+  | { status: "done"; saved: SavedReceipt; providerName: string }
   | { status: "error"; message: string };
 
 const UNKNOWN_ERROR_MESSAGE = "Ocurrió un error inesperado. Intenta de nuevo.";
-
-function toErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE;
-}
 
 function toCapturedPhotos(files: File[]): CapturedPhoto[] {
   return files.map((file) => ({ file, url: URL.createObjectURL(file) }));
@@ -48,7 +44,7 @@ export function useReceiptAnalysis() {
 
   useEffect(() => () => revokePhotoUrls(photosRef.current), []);
 
-  /** Descarta la boleta actual y empieza una nueva con estas fotos. */
+  /** Descarta la boleta actual y empieza una nueva con estas fotos (sin fotos = inicio). */
   const startNewReceipt = useCallback((files: File[]) => {
     revokePhotoUrls(photosRef.current);
     setPhotos(toCapturedPhotos(files.slice(0, MAX_RECEIPT_IMAGES)));
@@ -71,22 +67,23 @@ export function useReceiptAnalysis() {
   const analyzePhotos = useCallback(async () => {
     setState({ status: "processing" });
     try {
-      const resizedPhotos = await Promise.all(
-        photosRef.current.map((photo) => resizeImageToJpeg(photo.file)),
+      const { receipt, providerName } = await readReceiptPhotos(
+        photosRef.current.map((photo) => photo.file),
       );
-      const result = await requestReceiptAnalysis(resizedPhotos);
-      setState({ status: "done", ...result });
+      setState({ status: "done", saved: createSavedReceipt(receipt), providerName });
     } catch (error) {
-      setState({ status: "error", message: toErrorMessage(error) });
+      setState({ status: "error", message: toErrorMessage(error, UNKNOWN_ERROR_MESSAGE) });
     }
   }, []);
 
   const photoUrls = photos.map((photo) => photo.url);
+  const photoFiles = photos.map((photo) => photo.file);
   const canAddPhotos = photos.length < MAX_RECEIPT_IMAGES;
 
   return {
     state,
     photoUrls,
+    photoFiles,
     canAddPhotos,
     startNewReceipt,
     addPhotos,

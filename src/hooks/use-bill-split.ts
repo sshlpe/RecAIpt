@@ -8,6 +8,7 @@ import {
   setPartyUnits,
   toggleShared,
   toggleSharedParty,
+  type BillSplit,
 } from "@/lib/split/bill-split";
 
 export interface BillSplitActions {
@@ -21,11 +22,13 @@ export interface BillSplitActions {
   ) => void;
   toggleShared: (productKey: string) => void;
   toggleSharedParty: (productKey: string, partyId: string) => void;
+  /** Empieza de cero (tras una lectura nueva, los productos pueden ser otros). */
+  reset: () => void;
 }
 
 /** Estado de la división de la cuenta; la lógica vive en funciones puras de `bill-split`. */
-export function useBillSplit() {
-  const [split, setSplit] = useState(() => createBillSplit());
+export function useBillSplit(initialSplit: BillSplit) {
+  const [split, setSplit] = useState(initialSplit);
 
   const actions = useMemo<BillSplitActions>(
     () => ({
@@ -36,6 +39,7 @@ export function useBillSplit() {
       toggleShared: (productKey) => setSplit((current) => toggleShared(current, productKey)),
       toggleSharedParty: (productKey, partyId) =>
         setSplit((current) => toggleSharedParty(current, productKey, partyId)),
+      reset: () => setSplit(createBillSplit()),
     }),
     [],
   );

@@ -22,6 +22,8 @@ el neto y el IVA tampoco.
 en "printedTaxes". Los que ya vienen incluidos en los precios no se ponen.
 - Una entrada en "items" por cada línea de producto cobrado. No incluyas subtotales, IVA, propina, \
 descuentos ni totales como items; esos van en sus campos propios.
+- "merchantName" y "purchaseDate" solo si están escritos en la boleta (en Chile la fecha suele ir \
+día/mes/año). No los deduzcas de otras pistas.
 - No inventes líneas ni montos. Si un campo no aparece en la boleta, usa null.
 - Usa el mismo "name" para el mismo producto aunque esté escrito distinto en distintas líneas.
 - En letra manuscrita o impresión borrosa, marca con confianza "medium" o "low" toda línea con \

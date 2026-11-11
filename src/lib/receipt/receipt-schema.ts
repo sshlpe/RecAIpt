@@ -61,6 +61,17 @@ export const receiptSchema = z.object({
       "Código ISO 4217 de la moneda (CLP, EUR, USD...). Dedúcelo de símbolos, país, idioma o " +
         "formato de los números. Si no hay pistas, CLP.",
     ),
+  merchantName: z
+    .string()
+    .nullable()
+    .describe("Nombre del local o comercio, tal como aparece en la boleta. null si no aparece."),
+  purchaseDate: z
+    .string()
+    .nullable()
+    .describe(
+      'Fecha de la compra en formato "YYYY-MM-DD" (ej: "10/11/26" -> "2026-11-10"). ' +
+        "null si no aparece.",
+    ),
   items: z.array(receiptItemSchema).describe("Cada línea de producto cobrado, en orden."),
   printedSubtotal: optionalAmountField(
     "Monto escrito que corresponde a la SUMA DE LOS PRODUCTOS, se llame Subtotal, Valor o " +

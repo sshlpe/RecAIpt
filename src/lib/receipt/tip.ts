@@ -20,7 +20,15 @@ export function tipPercentOf(amount: number, base: number): number | null {
   return Math.round((amount / base) * 1000) / 10;
 }
 
-/** Monto de la propina; un porcentaje se calcula sobre el consumo menos descuentos. */
+/**
+ * Base sobre la que se calcula un porcentaje de propina: el consumo bruto, ANTES de descuentos e
+ * impuestos agregados. Así lo hacen los locales (ej: descuentos por pagar con cierta tarjeta).
+ */
+export function tipBase(itemsSum: number): number {
+  return itemsSum;
+}
+
+/** Monto de la propina; un porcentaje se calcula sobre la base (ver `tipBase`). */
 export function calculateTipAmount(choice: TipChoice, base: number, currency: string): number {
   if (choice.kind === "amount") return choice.amount;
   return roundToCurrency((base * choice.percent) / 100, currency);

@@ -31,6 +31,18 @@ export type PrintedTotals = Pick<
   "printedSubtotal" | "printedDiscount" | "printedTaxes" | "printedTip" | "printedTotal"
 >;
 
+/** Montos del pie de la boleta, con su nombre en pantalla (formulario y correcciones). */
+export const PRINTED_TOTAL_FIELDS: { key: keyof PrintedTotals; label: string }[] = [
+  { key: "printedSubtotal", label: "Subtotal" },
+  { key: "printedDiscount", label: "Descuento" },
+  { key: "printedTaxes", label: "Impuestos que se suman aparte" },
+  { key: "printedTip", label: "Propina" },
+  { key: "printedTotal", label: "Total" },
+];
+
+/** Datos de la boleta que no son montos: de qué local y de qué día. */
+export type ReceiptInfo = Pick<Receipt, "merchantName" | "purchaseDate">;
+
 export const ADDED_ITEM_ORIGINAL_TEXT = "Agregado por ti";
 
 /** Una línea revisada por el usuario deja de estar en duda. */
@@ -179,4 +191,29 @@ export function updatePrintedTotals(
   totals: PrintedTotals,
 ): EditableReceipt {
   return { ...receipt, ...totals };
+}
+
+/** Nombre del local y fecha; vacío = no aparece (se muestra "Boleta" y el día en que se leyó). */
+export function updateReceiptInfo(receipt: EditableReceipt, info: ReceiptInfo): EditableReceipt {
+  return {
+    ...receipt,
+    merchantName: info.merchantName?.trim() || null,
+    purchaseDate: info.purchaseDate || null,
+  };
+}
+
+/**
+ * "Volver a lo que leyó la IA": deshace las correcciones de lectura (productos y montos) pero
+ * conserva lo que decidió el usuario y no es una lectura: nombre, fecha y propina elegida.
+ */
+export function discardReadingCorrections(
+  receipt: EditableReceipt,
+  original: Receipt,
+): EditableReceipt {
+  return {
+    ...toEditableReceipt(original),
+    merchantName: receipt.merchantName,
+    purchaseDate: receipt.purchaseDate,
+    addedTip: receipt.addedTip,
+  };
 }

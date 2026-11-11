@@ -1,5 +1,5 @@
 import { formatCurrency } from "@/lib/format/currency";
-import { formatQuantity } from "@/lib/format/format-numbers";
+import { formatQuantityLabel } from "@/lib/format/format-numbers";
 import type { EditableItem } from "@/lib/receipt/editable-receipt";
 import { findInterpretedText } from "@/lib/receipt/item-interpretation";
 import type { ItemIssue } from "@/lib/receipt/summarize-receipt";
@@ -8,7 +8,7 @@ import { ItemActions, type ItemActionHandlers } from "./item-actions";
 
 /** "2 × Coca-Cola": cómo se nombra una línea en toda la app. */
 export function describeItemLine(item: EditableItem): string {
-  return `${formatQuantity(item.quantity)} × ${item.name}`;
+  return formatQuantityLabel(item.quantity, item.name);
 }
 
 interface ItemLineCardProps extends ItemActionHandlers {

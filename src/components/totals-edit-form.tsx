@@ -3,17 +3,9 @@
 import { useState, type FormEvent } from "react";
 import { getCurrencyDecimals } from "@/lib/format/currency";
 import { formatNumberForInput, parseOptionalNumber } from "@/lib/format/format-numbers";
-import type { PrintedTotals } from "@/lib/receipt/editable-receipt";
+import { PRINTED_TOTAL_FIELDS, type PrintedTotals } from "@/lib/receipt/editable-receipt";
 import { ActionButton } from "./ui/action-button";
 import { TextField } from "./ui/text-field";
-
-const TOTAL_FIELDS: { key: keyof PrintedTotals; label: string }[] = [
-  { key: "printedSubtotal", label: "Subtotal" },
-  { key: "printedDiscount", label: "Descuento" },
-  { key: "printedTaxes", label: "Impuestos que se suman aparte" },
-  { key: "printedTip", label: "Propina" },
-  { key: "printedTotal", label: "Total" },
-];
 
 type TotalFields = Record<keyof PrintedTotals, string>;
 
@@ -25,14 +17,14 @@ interface TotalsEditFormProps {
 
 function toFields(totals: PrintedTotals, decimals: number): TotalFields {
   return Object.fromEntries(
-    TOTAL_FIELDS.map(({ key }) => [key, formatNumberForInput(totals[key], decimals)]),
+    PRINTED_TOTAL_FIELDS.map(({ key }) => [key, formatNumberForInput(totals[key], decimals)]),
   ) as TotalFields;
 }
 
 /** Devuelve los totales o el nombre del primer campo inválido. */
 function parseFields(fields: TotalFields, decimals: number): PrintedTotals | string {
   const totals = {} as PrintedTotals;
-  for (const { key, label } of TOTAL_FIELDS) {
+  for (const { key, label } of PRINTED_TOTAL_FIELDS) {
     const parsed = parseOptionalNumber(fields[key], decimals);
     if (!parsed.isValid) return label;
     totals[key] = parsed.value;
@@ -58,7 +50,7 @@ export function TotalsEditForm({ initial, currency, onSave }: TotalsEditFormProp
       <p className="text-lg text-muted">
         Escribe los montos tal como aparecen en la boleta. Deja vacío lo que no aparece.
       </p>
-      {TOTAL_FIELDS.map(({ key, label }) => (
+      {PRINTED_TOTAL_FIELDS.map(({ key, label }) => (
         <TextField
           key={key}
           label={label}

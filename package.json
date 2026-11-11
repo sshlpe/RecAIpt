@@ -21,6 +21,7 @@
     "@anthropic-ai/sdk": "^1.6.0",
     "@google/genai": "^2.32.0",
     "@opennextjs/cloudflare": "^1.20.16",
+    "idb-keyval": "^6.3.0",
     "next": "16.4.5",
     "react": "19.3.0",
     "react-dom": "19.3.0",

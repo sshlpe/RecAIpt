@@ -1,4 +1,4 @@
-import { formatQuantity } from "@/lib/format/format-numbers";
+import { formatQuantity, formatQuantityLabel } from "@/lib/format/format-numbers";
 import type { AmountFormatter } from "@/lib/receipt/describe-verification";
 import type { ItemGroup } from "@/lib/receipt/group-items";
 import type { ProductAllocation, SplitParty } from "@/lib/split/bill-split";
@@ -42,7 +42,7 @@ export function ProductAllocationCard({
     >
       <div className="flex items-start justify-between gap-4">
         <p className="text-lg font-semibold">
-          {formatQuantity(group.totalQuantity)} × {group.name}
+          {formatQuantityLabel(group.totalQuantity, group.name)}
         </p>
         <p className="shrink-0 text-lg font-bold tabular-nums">{formatAmount(group.totalAmount)}</p>
       </div>

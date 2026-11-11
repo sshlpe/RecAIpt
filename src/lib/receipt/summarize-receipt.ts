@@ -9,7 +9,7 @@ import {
 } from "./describe-verification";
 import type { EditableItem, EditableReceipt } from "./editable-receipt";
 import { groupItemsByName, type ItemGroup } from "./group-items";
-import { calculateTipAmount } from "./tip";
+import { calculateTipAmount, tipBase } from "./tip";
 import { verifyReceipt, type ReceiptVerification } from "./verify-totals";
 
 export interface ItemIssue {
@@ -29,6 +29,8 @@ export interface ReceiptSummary {
   spokenSummary: string;
   /** Consumo, descuento y propina efectiva (escrita o agregada por el usuario). */
   charges: SplitCharges;
+  /** Sobre qué se calculan los porcentajes de propina (consumo antes del descuento). */
+  tipBase: number;
   /** Lo que hay que pagar: consumo − descuento + impuestos agregados + propina. */
   payableTotal: number;
 }
@@ -62,18 +64,13 @@ function countTotalsIssues(verification: ReceiptVerification): number {
   return checks.filter((check) => check && !check.matches).length;
 }
 
-/** Base sobre la que se calcula un porcentaje de propina: consumo menos descuentos. */
-export function tipBase(receipt: EditableReceipt, itemsSum: number): number {
-  return itemsSum - (receipt.printedDiscount ?? 0);
-}
-
 /**
  * Propina que se paga: la que eligió el usuario; si no eligió, la escrita en la boleta
  * (sugerida o incluida). La verificación de la boleta sigue usando solo la escrita.
  */
 function effectiveTip(receipt: EditableReceipt, itemsSum: number, currency: string): number {
   if (receipt.addedTip) {
-    return calculateTipAmount(receipt.addedTip, tipBase(receipt, itemsSum), currency);
+    return calculateTipAmount(receipt.addedTip, tipBase(itemsSum), currency);
   }
   return receipt.printedTip ?? 0;
 }
@@ -102,6 +99,7 @@ export function summarizeReceipt(receipt: EditableReceipt): ReceiptSummary {
     issueCount: issuesByItemId.size + countTotalsIssues(verification),
     spokenSummary: buildSpokenSummary(groups, verification, currency),
     charges,
+    tipBase: tipBase(verification.itemsSum),
     payableTotal: charges.itemsSum - charges.discount + charges.taxes + charges.tip,
   };
 }
