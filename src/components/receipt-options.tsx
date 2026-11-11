@@ -40,6 +40,7 @@ function RereadStatus({ state }: { state: RereadState }) {
 export function ReceiptOptions(props: ReceiptOptionsProps) {
   const { photos, hasCorrections, rereadState, onReread, onResetToOriginal, children } = props;
   const isReading = rereadState.status === "reading";
+  const hasPhotos = photos.length > 0;
 
   return (
     <section className="space-y-3" aria-labelledby="receipt-options-title">
@@ -49,20 +50,21 @@ export function ReceiptOptions(props: ReceiptOptionsProps) {
       <RereadStatus state={rereadState} />
       {!isReading && (
         <ConfirmAction
-          label="Reprocesar"
+          // Sin fotos en memoria (historial) hay que sacar otra: el nombre lo dice desde el inicio.
+          label={hasPhotos ? "Reprocesar" : "Reprocesar con otra foto"}
           warning={
-            photos.length > 0
+            hasPhotos
               ? "La IA vuelve a leer la foto. Se pierden las correcciones y la división de esta boleta."
-              : "Sube de nuevo la foto y la IA la vuelve a leer. Se pierden las correcciones y la división de esta boleta."
+              : "Las fotos no se guardan: saca otra foto de esta boleta y la IA la vuelve a leer. Se pierden las correcciones y la división."
           }
           renderConfirm={(close) =>
-            photos.length > 0 ? (
+            hasPhotos ? (
               <ActionButton onClick={() => (onReread(photos), close())}>
                 Sí, reprocesar
               </ActionButton>
             ) : (
               <CaptureReceiptButton
-                label="Subir la foto de nuevo"
+                label="Sacar otra foto"
                 onPhotosSelected={(files) => (onReread(files), close())}
               />
             )
