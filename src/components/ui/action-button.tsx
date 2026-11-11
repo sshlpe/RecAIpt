@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes } from "react";
 
 export type ActionButtonVariant =
-  "primary" | "secondary" | "positive" | "danger" | "danger-outline" | "on-brand";
+  "primary" | "secondary" | "positive" | "danger" | "danger-outline" | "on-brand" | "on-paper";
 export type ActionButtonSize = "large" | "compact" | "icon" | "icon-small";
 
 const BASE_CLASS =
@@ -27,8 +27,10 @@ const VARIANT_CLASS: Record<ActionButtonVariant, string> = {
   danger: "bg-danger text-background",
   /** Ofrecer una acción destructiva antes de confirmarla: contorno rojo. */
   "danger-outline": "border-2 border-danger bg-background text-danger",
-  /** Sobre la barra teal de la marca: contorno y texto claros. */
+  /** Sobre la barra de la marca: contorno y texto claros. */
   "on-brand": "border-2 border-brand-bar-foreground/70 text-brand-bar-foreground",
+  /** Sobre el papel de boleta (claro en ambos modos): tinta del papel. */
+  "on-paper": "border-2 border-ink text-ink",
 };
 
 /**

@@ -1,23 +1,38 @@
 import { describeChargeLines } from "@/lib/receipt/charge-lines";
 import type { ReceiptSummary } from "@/lib/receipt/summarize-receipt";
+import { IconButton } from "./ui/icon-button";
+import { PencilIcon } from "./ui/icons";
 import { ReceiptLine, ReceiptPaper } from "./ui/receipt-paper";
+
+interface ChargesBreakdownProps {
+  summary: ReceiptSummary;
+  /** Abre la corrección de los totales escritos (descuento, impuestos, propina, total). */
+  onEdit: () => void;
+}
 
 /**
  * Cómo se arma el total a pagar, como un trozo de boleta: productos, descuento, impuestos
- * agregados y propina. Solo aparece si hay algo además de los productos (si no, repetiría
- * el total) y solo muestra las líneas que existen.
+ * agregados y propina (solo las líneas que existen). Se muestra siempre, aunque no haya cargos:
+ * el lápiz es donde se agrega un descuento que la lectura se saltó.
  */
-export function ChargesBreakdown({ summary }: { summary: ReceiptSummary }) {
+export function ChargesBreakdown({ summary, onEdit }: ChargesBreakdownProps) {
   const { charges, payableTotal, formatAmount } = summary;
-  const extraLines = describeChargeLines(charges);
-  if (extraLines.length === 0) return null;
 
   return (
     <ReceiptPaper>
-      <h2 className="text-xl font-extrabold">Cómo se arma el total</h2>
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="text-xl font-extrabold">Cómo se arma el total</h2>
+        <IconButton
+          icon={<PencilIcon />}
+          label="Corregir descuento y totales"
+          variant="on-paper"
+          small
+          onClick={onEdit}
+        />
+      </div>
       <ul className="mt-4 space-y-2">
         <ReceiptLine label="Productos" value={formatAmount(charges.itemsSum)} />
-        {extraLines.map((line) => (
+        {describeChargeLines(charges).map((line) => (
           <ReceiptLine key={line.label} label={line.label} value={formatAmount(line.amount)} />
         ))}
         <ReceiptLine label="Total a pagar" value={formatAmount(payableTotal)} />

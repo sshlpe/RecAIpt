@@ -96,7 +96,7 @@ export function ReceiptResult(props: ReceiptResultProps) {
             formatAmount={summary.formatAmount}
             onChange={actions.setTip}
           />
-          <ChargesBreakdown summary={summary} />
+          <ChargesBreakdown summary={summary} onEdit={() => setSheet({ kind: "edit-totals" })} />
           {itemView === "split" && (
             <SplitView summary={summary} split={billSplit.split} actions={billSplit.actions} />
           )}
