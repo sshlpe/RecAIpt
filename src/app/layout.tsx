@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Atkinson_Hyperlegible_Mono, Atkinson_Hyperlegible_Next } from "next/font/google";
+import { ActiveReceiptProvider } from "@/components/active-receipt-provider";
 import { APP_DESCRIPTION, APP_NAME, BRAND_BACKGROUND } from "@/lib/config/app-info";
 import "./globals.css";
 
@@ -36,7 +37,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${atkinson.variable} ${atkinsonMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        <ActiveReceiptProvider>{children}</ActiveReceiptProvider>
+      </body>
     </html>
   );
 }

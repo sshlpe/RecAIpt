@@ -2,11 +2,12 @@
 
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { isSpeechSupported, speakText, stopSpeaking } from "@/lib/speech/speak-text";
-import { ActionButton } from "./ui/action-button";
+import { IconButton } from "./ui/icon-button";
+import { SpeakerIcon, StopIcon } from "./ui/icons";
 
 const subscribeToNothing = () => () => {};
 
-/** Botón para leer un texto en voz alta; vuelve a presionarse para detener. */
+/** Ícono de parlante: lee un texto en voz alta; vuelve a presionarse para detener. */
 export function SpeakButton({ text }: { text: string }) {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const isSupported = useSyncExternalStore(subscribeToNothing, isSpeechSupported, () => false);
@@ -26,9 +27,11 @@ export function SpeakButton({ text }: { text: string }) {
   }
 
   return (
-    <ActionButton variant="secondary" onClick={toggleSpeech} aria-pressed={isSpeaking}>
-      <span aria-hidden>{isSpeaking ? "⏹" : "🔊"}</span>
-      {isSpeaking ? "Detener lectura" : "Leer en voz alta"}
-    </ActionButton>
+    <IconButton
+      icon={isSpeaking ? <StopIcon /> : <SpeakerIcon />}
+      label={isSpeaking ? "Detener lectura" : "Leer en voz alta"}
+      onClick={toggleSpeech}
+      aria-pressed={isSpeaking}
+    />
   );
 }

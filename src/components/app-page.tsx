@@ -1,14 +1,11 @@
 import type { ReactNode } from "react";
-import { AppLogo } from "./ui/app-logo";
+import { AppHeader } from "./app-header";
 
-/** Marco común de las páginas: ancho de teléfono y logo arriba. */
+/** Marco común de las páginas: ancho de teléfono y encabezado con las acciones. */
 export function AppPage({ children }: { children: ReactNode }) {
   return (
     <main className="mx-auto w-full max-w-xl flex-1 px-4 py-6">
-      {/* Marca; el título principal (h1) lo pone cada pantalla. */}
-      <header className="mb-5">
-        <AppLogo />
-      </header>
+      <AppHeader />
       {children}
     </main>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import type { ReceiptInfo } from "@/lib/receipt/editable-receipt";
 import { receiptDateLabel, receiptTitle } from "@/lib/receipt/receipt-info";
 import { ReceiptInfoForm } from "./receipt-info-form";
@@ -12,10 +12,12 @@ interface ReceiptHeaderProps {
   /** ISO: la fecha que se muestra si la boleta no trae una. */
   readAt: string;
   onSave: (info: ReceiptInfo) => void;
+  /** Botones extra junto a "Editar" (ej: leer en voz alta). */
+  actions?: ReactNode;
 }
 
 /** Título de la boleta (local y fecha), con su propio panel para corregirlos. */
-export function ReceiptHeader({ info, readAt, onSave }: ReceiptHeaderProps) {
+export function ReceiptHeader({ info, readAt, onSave, actions }: ReceiptHeaderProps) {
   const [isEditing, setIsEditing] = useState(false);
 
   return (
@@ -24,12 +26,15 @@ export function ReceiptHeader({ info, readAt, onSave }: ReceiptHeaderProps) {
         <h1 className="text-2xl font-extrabold break-words">{receiptTitle(info)}</h1>
         <p className="text-lg text-muted">{receiptDateLabel(info, readAt)}</p>
       </div>
-      <IconButton
-        icon="✎"
-        label="Editar nombre y fecha"
-        text="Editar"
-        onClick={() => setIsEditing(true)}
-      />
+      <div className="flex shrink-0 items-center gap-2">
+        {actions}
+        <IconButton
+          icon="✎"
+          label="Editar nombre y fecha"
+          text="Editar"
+          onClick={() => setIsEditing(true)}
+        />
+      </div>
       <BottomSheet open={isEditing} title="Nombre y fecha" onClose={() => setIsEditing(false)}>
         <ReceiptInfoForm
           initial={info}

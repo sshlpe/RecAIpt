@@ -4,7 +4,6 @@ import { useState, type ReactNode } from "react";
 import type { ReceiptSession } from "@/hooks/use-receipt-session";
 import type { ItemActionHandlers } from "./item-actions";
 import { GroupedItemList, OriginalItemList } from "./item-lists";
-import { CaptureReceiptButton } from "./capture-receipt-button";
 import { ChargesBreakdown } from "./charges-breakdown";
 import { ReceiptHeader } from "./receipt-header";
 import { ReceiptOptions } from "./receipt-options";
@@ -13,8 +12,7 @@ import { SpeakButton } from "./speak-button";
 import { SplitView } from "./split/split-view";
 import { TipSelector } from "./tip-selector";
 import { TotalBar } from "./total-bar";
-import { IconButton } from "./ui/icon-button";
-import { HistoryIcon, ImageIcon, PlusIcon } from "./ui/icons";
+import { ActionButton } from "./ui/action-button";
 import { SegmentedToggle } from "./ui/segmented-toggle";
 import { VerificationSummary } from "./verification-summary";
 
@@ -33,15 +31,12 @@ interface ReceiptResultProps {
   /** Fotos de la lectura recién hecha; vacías en una boleta del historial (no se guardan). */
   photoUrls: string[];
   photos: File[];
-  /** Solo en la lectura recién hecha: el historial tiene su propia navegación. */
-  onNewReceipt?: (photos: File[]) => void;
-  onShowHistory?: () => void;
   /** Opciones extra al final (ej: borrar, en el historial). */
   extraOptions?: ReactNode;
 }
 
 export function ReceiptResult(props: ReceiptResultProps) {
-  const { session, photoUrls, photos, onNewReceipt, onShowHistory, extraOptions } = props;
+  const { session, photoUrls, photos, extraOptions } = props;
   const { receipt, actions, summary, billSplit } = session;
   const [itemView, setItemView] = useState<ItemView>("grouped");
   const [sheet, setSheet] = useState<ActiveSheet>(null);
@@ -56,16 +51,28 @@ export function ReceiptResult(props: ReceiptResultProps) {
     issuesByItemId: summary.issuesByItemId,
     onOpenDetails: (title: string, itemIds: string[]) =>
       setSheet({ kind: "details", title, itemIds }),
+    onAddItem: () => setSheet({ kind: "add-item" }),
   };
   const hasItems = receipt.items.length > 0;
 
   return (
     <div className="space-y-6">
-      <ReceiptHeader info={receipt} readAt={session.readAt} onSave={actions.saveInfo} />
-      {!hasItems && <VerificationSummary message={summary.message} />}
+      <ReceiptHeader
+        info={receipt}
+        readAt={session.readAt}
+        onSave={actions.saveInfo}
+        actions={hasItems && <SpeakButton text={summary.spokenSummary} />}
+      />
+      {!hasItems && (
+        <>
+          <VerificationSummary message={summary.message} />
+          <ActionButton variant="secondary" onClick={listProps.onAddItem}>
+            Agregar producto
+          </ActionButton>
+        </>
+      )}
       {hasItems && (
         <>
-          <SpeakButton text={summary.spokenSummary} />
           <SegmentedToggle
             ariaLabel="Forma de ver los productos"
             options={ITEM_VIEW_OPTIONS}
@@ -90,32 +97,6 @@ export function ReceiptResult(props: ReceiptResultProps) {
           )}
         </>
       )}
-      <div className="flex items-center justify-center gap-4">
-        <IconButton
-          icon={<PlusIcon />}
-          label="Agregar producto"
-          variant="positive"
-          onClick={() => setSheet({ kind: "add-item" })}
-        />
-        {photoUrls.length > 0 && (
-          <IconButton
-            icon={<ImageIcon />}
-            label="Ver foto original"
-            onClick={() => setSheet({ kind: "photo" })}
-          />
-        )}
-        {onShowHistory && (
-          <IconButton icon={<HistoryIcon />} label="Boletas anteriores" onClick={onShowHistory} />
-        )}
-        {onNewReceipt && (
-          <CaptureReceiptButton
-            label="Nueva boleta (otro gasto)"
-            variant="secondary"
-            iconOnly
-            onPhotosSelected={onNewReceipt}
-          />
-        )}
-      </div>
       <ReceiptOptions
         photos={photos}
         hasCorrections={session.corrections.length > 0}
@@ -125,7 +106,11 @@ export function ReceiptResult(props: ReceiptResultProps) {
       >
         {extraOptions}
       </ReceiptOptions>
-      <TotalBar summary={summary} onOpenReview={() => setSheet({ kind: "review" })} />
+      <TotalBar
+        summary={summary}
+        onOpenReview={() => setSheet({ kind: "review" })}
+        onShowPhotos={photoUrls.length > 0 ? () => setSheet({ kind: "photo" }) : undefined}
+      />
       <ReceiptSheets
         sheet={sheet}
         onSheetChange={setSheet}

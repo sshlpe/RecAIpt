@@ -37,6 +37,8 @@ export function useReceiptAnalysis() {
   const [state, setState] = useState<ReceiptAnalysisState>({ status: "capturing" });
   // Espejo de `photos` para los callbacks (estables) y para liberar las URLs al desmontar.
   const photosRef = useRef(photos);
+  // Sube con cada boleta nueva: una lectura que termina tarde (de la anterior) se descarta.
+  const receiptVersionRef = useRef(0);
 
   useEffect(() => {
     photosRef.current = photos;
@@ -46,6 +48,7 @@ export function useReceiptAnalysis() {
 
   /** Descarta la boleta actual y empieza una nueva con estas fotos (sin fotos = inicio). */
   const startNewReceipt = useCallback((files: File[]) => {
+    receiptVersionRef.current += 1;
     revokePhotoUrls(photosRef.current);
     setPhotos(toCapturedPhotos(files.slice(0, MAX_RECEIPT_IMAGES)));
     setState({ status: "capturing" });
@@ -66,13 +69,18 @@ export function useReceiptAnalysis() {
 
   const analyzePhotos = useCallback(async () => {
     setState({ status: "processing" });
+    const version = receiptVersionRef.current;
+    const isCurrent = () => version === receiptVersionRef.current;
     try {
       const { receipt, providerName } = await readReceiptPhotos(
         photosRef.current.map((photo) => photo.file),
       );
-      setState({ status: "done", saved: createSavedReceipt(receipt), providerName });
+      if (isCurrent())
+        setState({ status: "done", saved: createSavedReceipt(receipt), providerName });
     } catch (error) {
-      setState({ status: "error", message: toErrorMessage(error, UNKNOWN_ERROR_MESSAGE) });
+      if (isCurrent()) {
+        setState({ status: "error", message: toErrorMessage(error, UNKNOWN_ERROR_MESSAGE) });
+      }
     }
   }, []);
 

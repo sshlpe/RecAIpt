@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useSavedReceipt } from "@/hooks/use-receipt-history";
+import { HISTORY_PATH } from "@/lib/config/routes";
 import { useReceiptSession } from "@/hooks/use-receipt-session";
 import { deleteReceipt } from "@/lib/history/receipt-history-store";
 import type { SavedReceipt } from "@/lib/history/saved-receipt";
@@ -13,13 +14,11 @@ import { ConfirmAction } from "../ui/confirm-action";
 import { NoticeBox } from "../ui/notice-box";
 import { FinalReceiptSummary } from "./final-receipt-summary";
 
-const HOME_PATH = "/";
-
-/** `replace`: volver al inicio no deja la boleta en el "atrás". */
+/** `replace`: volver al historial no deja la boleta inexistente en el "atrás". */
 function BackToHistoryLink() {
   return (
-    <Link href={HOME_PATH} replace className={actionButtonClassName("secondary", "compact")}>
-      ← Boletas anteriores
+    <Link href={HISTORY_PATH} replace className={actionButtonClassName("secondary", "compact")}>
+      ← Historial
     </Link>
   );
 }
@@ -42,7 +41,7 @@ function SavedReceiptView({ saved }: { saved: SavedReceipt }) {
 
   async function handleDelete() {
     await deleteReceipt(saved.id);
-    router.replace(HOME_PATH);
+    router.replace(HISTORY_PATH);
   }
   const deleteAction = <DeleteReceiptAction onDelete={handleDelete} />;
 
@@ -79,10 +78,5 @@ export function SavedReceiptScreen({ id }: { id: string }) {
       </div>
     );
   }
-  return (
-    <div className="space-y-6">
-      <BackToHistoryLink />
-      <SavedReceiptView key={state.value.id} saved={state.value} />
-    </div>
-  );
+  return <SavedReceiptView key={state.value.id} saved={state.value} />;
 }

@@ -14,7 +14,9 @@ function findSpanishVoice(): SpeechSynthesisVoice | undefined {
 }
 
 export function stopSpeaking(): void {
-  if (isSpeechSupported()) window.speechSynthesis.cancel();
+  if (!isSpeechSupported()) return;
+  const { speechSynthesis } = window;
+  if (speechSynthesis.speaking || speechSynthesis.pending) speechSynthesis.cancel();
 }
 
 /** Lee el texto en voz alta con voz en español; `onEnd` se llama al terminar o cancelar. */
@@ -26,6 +28,14 @@ export function speakText(text: string, onEnd?: () => void): void {
   utterance.rate = SPEECH_RATE;
   utterance.voice = findSpanishVoice() ?? null;
   utterance.onend = () => onEnd?.();
-  utterance.onerror = () => onEnd?.();
+  utterance.onerror = (event) => {
+    // "interrupted"/"canceled" son esperables al detener; el resto ayuda a diagnosticar.
+    if (event.error !== "interrupted" && event.error !== "canceled") {
+      console.error("Lectura en voz alta falló:", event.error);
+    }
+    onEnd?.();
+  };
+  // Chrome puede quedar en pausa tras un error previo: sin resume, speak no suena.
+  window.speechSynthesis.resume();
   window.speechSynthesis.speak(utterance);
 }

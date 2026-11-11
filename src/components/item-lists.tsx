@@ -5,6 +5,7 @@ import { findInterpretedText } from "@/lib/receipt/item-interpretation";
 import type { ItemIssue } from "@/lib/receipt/summarize-receipt";
 import { describeInterpretedText } from "./interpreted-text";
 import { describeItemLine } from "./item-line-card";
+import { PlusIcon } from "./ui/icons";
 import { MoneyRow } from "./ui/money-row";
 
 const REVIEW_FLAG = "Revisar";
@@ -18,6 +19,28 @@ interface ItemListProps {
   currency: string;
   issuesByItemId: Map<string, ItemIssue>;
   onOpenDetails: OpenItemDetails;
+  onAddItem: () => void;
+}
+
+/** Última fila de la lista: agregar un producto que la lectura se saltó. */
+function AddItemRow({ onAddItem }: { onAddItem: () => void }) {
+  return (
+    <li>
+      <button
+        type="button"
+        onClick={onAddItem}
+        className="flex w-full cursor-pointer items-center gap-3 px-3 py-4 text-left text-lg font-bold text-success"
+      >
+        <span
+          aria-hidden
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-success text-background"
+        >
+          <PlusIcon />
+        </span>
+        Agregar producto
+      </button>
+    </li>
+  );
 }
 
 function interpretedDetail(item: EditableItem): string | null {
@@ -41,6 +64,7 @@ export function GroupedItemList({
   currency,
   issuesByItemId,
   onOpenDetails,
+  onAddItem,
 }: ItemListProps & { groups: ItemGroup<EditableItem>[] }) {
   return (
     <ul>
@@ -64,6 +88,7 @@ export function GroupedItemList({
           />
         );
       })}
+      <AddItemRow onAddItem={onAddItem} />
     </ul>
   );
 }
@@ -74,6 +99,7 @@ export function OriginalItemList({
   currency,
   issuesByItemId,
   onOpenDetails,
+  onAddItem,
 }: ItemListProps & { items: EditableItem[] }) {
   return (
     <ul>
@@ -89,6 +115,7 @@ export function OriginalItemList({
           onSelect={() => onOpenDetails(describeItemLine(item), [item.id])}
         />
       ))}
+      <AddItemRow onAddItem={onAddItem} />
     </ul>
   );
 }

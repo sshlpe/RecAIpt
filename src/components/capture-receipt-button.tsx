@@ -1,15 +1,19 @@
 "use client";
 
 import type { ChangeEvent } from "react";
-import { actionButtonClassName, type ActionButtonVariant } from "./ui/action-button";
+import {
+  actionButtonClassName,
+  type ActionButtonSize,
+  type ActionButtonVariant,
+} from "./ui/action-button";
 import { ImagePlusIcon } from "./ui/icons";
 
 interface CaptureReceiptButtonProps {
   label: string;
   onPhotosSelected: (photos: File[]) => void;
   variant?: ActionButtonVariant;
-  /** Botón redondo solo con ícono; `label` queda como nombre accesible y tooltip. */
-  iconOnly?: boolean;
+  /** Con "icon", `label` queda solo como nombre accesible y tooltip. */
+  size?: ActionButtonSize;
 }
 
 /**
@@ -20,7 +24,7 @@ export function CaptureReceiptButton({
   label,
   onPhotosSelected,
   variant,
-  iconOnly = false,
+  size = "large",
 }: CaptureReceiptButtonProps) {
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
     const photos = Array.from(event.target.files ?? []);
@@ -30,11 +34,11 @@ export function CaptureReceiptButton({
 
   return (
     <label
-      title={iconOnly ? label : undefined}
-      className={actionButtonClassName(variant, iconOnly ? "icon" : "large")}
+      title={size === "icon" ? label : undefined}
+      className={actionButtonClassName(variant, size)}
     >
       <ImagePlusIcon />
-      <span className={iconOnly ? "sr-only" : undefined}>{label}</span>
+      <span className={size === "icon" ? "sr-only" : undefined}>{label}</span>
       <input
         type="file"
         accept="image/*"
