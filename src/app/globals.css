@@ -4,6 +4,10 @@
 :root {
   /* Papel térmico de boleta: igual en modo claro y oscuro (el papel es papel). */
   --paper: #eef1f5;
+  /* Barra superior de la marca: cyan 700, igual en ambos modos. Se separa del azul marino del
+     modo oscuro (3,3:1) y no se confunde con el azul de los botones; texto blanco 5,2:1. */
+  --brand-bar: #1a7595;
+  --brand-bar-foreground: #ffffff;
   --ink: #17213a;
   --ink-muted: #56607a;
   --background: #ffffff;
@@ -55,6 +59,8 @@
   --color-info: var(--info);
   --color-info-surface: var(--info-surface);
   --color-paper: var(--paper);
+  --color-brand-bar: var(--brand-bar);
+  --color-brand-bar-foreground: var(--brand-bar-foreground);
   --color-ink: var(--ink);
   --color-ink-muted: var(--ink-muted);
   /* Atkinson Hyperlegible: diseñada para baja visión (distingue 1/l/I, 0/O, 5/S). */

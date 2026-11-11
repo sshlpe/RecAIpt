@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes } from "react";
 
-export type ActionButtonVariant = "primary" | "secondary" | "positive";
-export type ActionButtonSize = "large" | "compact" | "icon" | "stacked";
+export type ActionButtonVariant = "primary" | "secondary" | "positive" | "on-brand";
+export type ActionButtonSize = "large" | "compact" | "icon" | "icon-small";
 
 const BASE_CLASS =
   "flex items-center justify-center font-bold cursor-pointer select-none " +
@@ -13,8 +13,8 @@ const SIZE_CLASS: Record<ActionButtonSize, string> = {
   compact: "min-h-11 gap-2 rounded-xl px-4 py-2 text-base",
   /** Solo ícono: círculo de 48 px (área táctil cómoda). */
   icon: "h-12 w-12 shrink-0 rounded-full",
-  /** Ícono arriba y texto chico abajo: acciones del encabezado, donde el ancho es escaso. */
-  stacked: "min-h-14 shrink-0 flex-col gap-0.5 rounded-xl px-2.5 py-1 text-sm leading-tight",
+  /** Acción secundaria discreta: 40 px, todavía cómoda de tocar. */
+  "icon-small": "h-10 w-10 shrink-0 rounded-full",
 };
 
 const VARIANT_CLASS: Record<ActionButtonVariant, string> = {
@@ -22,6 +22,8 @@ const VARIANT_CLASS: Record<ActionButtonVariant, string> = {
   secondary: "border-2 border-border bg-background text-foreground",
   /** Acciones de agregar: verde, con el texto del color del fondo para mantener contraste. */
   positive: "bg-success text-background",
+  /** Sobre la barra teal de la marca: contorno y texto claros. */
+  "on-brand": "border-2 border-brand-bar-foreground/70 text-brand-bar-foreground",
 };
 
 /**

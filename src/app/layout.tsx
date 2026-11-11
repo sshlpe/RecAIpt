@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Atkinson_Hyperlegible_Mono, Atkinson_Hyperlegible_Next } from "next/font/google";
 import { ActiveReceiptProvider } from "@/components/active-receipt-provider";
-import { APP_DESCRIPTION, APP_NAME, BRAND_BACKGROUND } from "@/lib/config/app-info";
+import { APP_DESCRIPTION, APP_NAME, BRAND_BAR } from "@/lib/config/app-info";
 import "./globals.css";
 
 /** Familia diseñada para baja visión; la Mono imita la impresión de una boleta. */
@@ -22,10 +22,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   // Sin "cover", Safari en iOS no pega al borde los elementos fixed abajo (deja un hueco).
   viewportFit: "cover",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: BRAND_BACKGROUND },
-  ],
+  // La barra del navegador sigue a la barra superior de la app.
+  themeColor: BRAND_BAR,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

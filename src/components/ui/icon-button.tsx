@@ -9,6 +9,8 @@ interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   /** Texto visible junto al ícono, opcional. */
   text?: string;
   variant?: ActionButtonVariant;
+  /** Versión discreta (40 px) para acciones secundarias. */
+  small?: boolean;
 }
 
 /** Botón de ícono (redondo si no lleva texto), con el mismo estilo base que los botones grandes. */
@@ -17,6 +19,7 @@ export function IconButton({
   label,
   text,
   variant = "secondary",
+  small = false,
   ...props
 }: IconButtonProps) {
   return (
@@ -24,7 +27,7 @@ export function IconButton({
       type="button"
       aria-label={label}
       title={label}
-      className={actionButtonClassName(variant, text ? "compact" : "icon")}
+      className={actionButtonClassName(variant, text ? "compact" : small ? "icon-small" : "icon")}
       {...props}
     >
       <span aria-hidden>{icon}</span>
