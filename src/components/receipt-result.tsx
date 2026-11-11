@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import type { ReceiptSession } from "@/hooks/use-receipt-session";
+import { buildSpokenReceipt } from "@/lib/receipt/build-spoken-summary";
 import type { ItemActionHandlers } from "./item-actions";
 import { GroupedItemList, OriginalItemList } from "./item-lists";
 import { ChargesBreakdown } from "./charges-breakdown";
@@ -38,6 +39,10 @@ interface ReceiptResultProps {
 export function ReceiptResult(props: ReceiptResultProps) {
   const { session, photoUrls, photos, extraOptions } = props;
   const { receipt, actions, summary, billSplit } = session;
+  const spokenReceipt = useMemo(
+    () => buildSpokenReceipt(receipt, session.readAt, summary),
+    [receipt, session.readAt, summary],
+  );
   const [itemView, setItemView] = useState<ItemView>("grouped");
   const [sheet, setSheet] = useState<ActiveSheet>(null);
 
@@ -61,7 +66,7 @@ export function ReceiptResult(props: ReceiptResultProps) {
         info={receipt}
         readAt={session.readAt}
         onSave={actions.saveInfo}
-        actions={hasItems && <SpeakButton text={summary.spokenSummary} />}
+        actions={hasItems && <SpeakButton segments={spokenReceipt} />}
       />
       {!hasItems && (
         <>

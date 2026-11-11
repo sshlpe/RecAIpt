@@ -13,9 +13,18 @@ export function formatQuantityLabel(quantity: number, name: string): string {
   return `${formatQuantity(quantity)} × ${name}`;
 }
 
+function formatPercentNumber(percent: number): string {
+  return percent.toLocaleString(NUMBER_LOCALE, { maximumFractionDigits: 1 });
+}
+
 /** 5.8 -> "5,8%", 10 -> "10%". */
 export function formatPercent(percent: number): string {
-  return `${percent.toLocaleString(NUMBER_LOCALE, { maximumFractionDigits: 1 })}%`;
+  return `${formatPercentNumber(percent)}%`;
+}
+
+/** Para voz: 10 -> "10 por ciento" (no todas las voces leen bien el "%"). */
+export function formatSpokenPercent(percent: number): string {
+  return `${formatPercentNumber(percent)} por ciento`;
 }
 
 /** Valor inicial de un campo editable: sin separador de miles para que sea fácil de corregir. */

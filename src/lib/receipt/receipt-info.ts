@@ -8,6 +8,18 @@ const DATE_FORMAT = new Intl.DateTimeFormat("es-CL", {
   month: "short",
   year: "numeric",
 });
+/** Para voz: "miércoles, 11 de noviembre"; el año solo si no es el actual. */
+const SPOKEN_DATE_FORMAT = new Intl.DateTimeFormat("es-CL", {
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+});
+const SPOKEN_DATE_WITH_YEAR_FORMAT = new Intl.DateTimeFormat("es-CL", {
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+});
 
 export function receiptTitle(info: ReceiptInfo): string {
   return info.merchantName?.trim() || DEFAULT_TITLE;
@@ -27,6 +39,16 @@ export function toDateInputValue(info: ReceiptInfo): string {
 }
 
 /** La fecha de la boleta; si no trae (o no se entiende), el día en que se leyó (`readAt`, ISO). */
+function receiptDate(info: ReceiptInfo, readAt: string): Date {
+  return parseIsoDate(info.purchaseDate) ?? new Date(readAt);
+}
+
 export function receiptDateLabel(info: ReceiptInfo, readAt: string): string {
-  return DATE_FORMAT.format(parseIsoDate(info.purchaseDate) ?? new Date(readAt));
+  return DATE_FORMAT.format(receiptDate(info, readAt));
+}
+
+export function receiptSpokenDate(info: ReceiptInfo, readAt: string): string {
+  const date = receiptDate(info, readAt);
+  const isThisYear = date.getFullYear() === new Date().getFullYear();
+  return (isThisYear ? SPOKEN_DATE_FORMAT : SPOKEN_DATE_WITH_YEAR_FORMAT).format(date);
 }

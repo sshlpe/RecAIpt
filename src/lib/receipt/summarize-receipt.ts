@@ -1,6 +1,5 @@
 import { formatCurrency, normalizeCurrency } from "@/lib/format/currency";
 import type { SplitCharges } from "@/lib/split/compute-split";
-import { buildSpokenSummary } from "./build-spoken-summary";
 import { isDoubtful } from "./confidence";
 import {
   describeVerification,
@@ -26,7 +25,6 @@ export interface ReceiptSummary {
   message: VerificationMessage;
   issuesByItemId: Map<string, ItemIssue>;
   issueCount: number;
-  spokenSummary: string;
   /** Consumo, descuento y propina efectiva (escrita o agregada por el usuario). */
   charges: SplitCharges;
   /** Sobre qué se calculan los porcentajes de propina (consumo antes del descuento). */
@@ -97,7 +95,6 @@ export function summarizeReceipt(receipt: EditableReceipt): ReceiptSummary {
     message: describeVerification(verification, receipt.items.length, formatAmount),
     issuesByItemId,
     issueCount: issuesByItemId.size + countTotalsIssues(verification),
-    spokenSummary: buildSpokenSummary(groups, verification, currency),
     charges,
     tipBase: tipBase(verification.itemsSum),
     payableTotal: charges.itemsSum - charges.discount + charges.taxes + charges.tip,
