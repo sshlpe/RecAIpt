@@ -8,6 +8,8 @@
      modo oscuro (3,3:1) y no se confunde con el azul de los botones; texto blanco 5,2:1. */
   --brand-bar: #1a7595;
   --brand-bar-foreground: #ffffff;
+  /* El "AI" del nombre en la barra: ámbar claro, 4,2:1 sobre el cyan (texto grande en negrita). */
+  --brand-bar-accent: #fde68a;
   --ink: #17213a;
   --ink-muted: #56607a;
   --background: #ffffff;
@@ -65,6 +67,7 @@
   --color-paper: var(--paper);
   --color-brand-bar: var(--brand-bar);
   --color-brand-bar-foreground: var(--brand-bar-foreground);
+  --color-brand-bar-accent: var(--brand-bar-accent);
   --color-ink: var(--ink);
   --color-ink-muted: var(--ink-muted);
   /* Atkinson Hyperlegible: diseñada para baja visión (distingue 1/l/I, 0/O, 5/S). */
