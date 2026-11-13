@@ -17,14 +17,19 @@ export interface ProductAllocation {
   unitsByParty: Record<string, number>;
 }
 
+/** "equal": la cuenta completa en partes iguales; "byProduct": cada grupo paga lo suyo. */
+export type SplitMode = "equal" | "byProduct";
+
 export interface BillSplit {
+  /** Ausente en boletas guardadas antes de existir el modo: eran todas por producto. */
+  mode?: SplitMode;
   parties: SplitParty[];
   /** Por clave de producto (toGroupingKey del nombre). */
   allocations: Record<string, ProductAllocation>;
 }
 
 export const MIN_PARTIES = 2;
-export const MAX_PARTIES = 8;
+export const MAX_PARTIES = 12;
 
 const EMPTY_ALLOCATION: ProductAllocation = { sharedBy: null, unitsByParty: {} };
 
@@ -40,7 +45,16 @@ export function createBillSplit(partyCount: number = MIN_PARTIES): BillSplit {
   const parties = Array.from({ length: clampPartyCount(partyCount) }, (_, index) =>
     createParty(index),
   );
-  return { parties, allocations: {} };
+  return { mode: "byProduct", parties, allocations: {} };
+}
+
+export function getSplitMode(split: BillSplit): SplitMode {
+  return split.mode ?? "byProduct";
+}
+
+/** Cambia el modo sin perder lo asignado por producto (se puede volver a él). */
+export function setSplitMode(split: BillSplit, mode: SplitMode): BillSplit {
+  return { ...split, mode };
 }
 
 export function getAllocation(split: BillSplit, productKey: string): ProductAllocation {
@@ -74,7 +88,7 @@ export function setPartyCount(split: BillSplit, count: number): BillSplit {
       },
     ]),
   );
-  return { parties, allocations };
+  return { ...split, parties, allocations };
 }
 
 export function renameParty(split: BillSplit, partyId: string, name: string): BillSplit {
@@ -129,8 +143,12 @@ export function toggleSharedParty(
   return withAllocation(split, productKey, { ...allocation, sharedBy });
 }
 
-/** Si se llegó a asignar algo: una división sin asignaciones no se muestra en el resumen. */
+/**
+ * Si se dividió: en partes iguales basta con elegir ese modo; por producto, con asignar algo.
+ * Una división sin usar no se muestra en el resumen.
+ */
 export function isSplitInUse(split: BillSplit): boolean {
+  if (getSplitMode(split) === "equal") return true;
   return Object.values(split.allocations).some(
     (allocation) =>
       (allocation.sharedBy?.length ?? 0) > 0 ||

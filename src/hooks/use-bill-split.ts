@@ -6,12 +6,15 @@ import {
   renameParty,
   setPartyCount,
   setPartyUnits,
+  setSplitMode,
   toggleShared,
   toggleSharedParty,
   type BillSplit,
+  type SplitMode,
 } from "@/lib/split/bill-split";
 
 export interface BillSplitActions {
+  setMode: (mode: SplitMode) => void;
   setPartyCount: (count: number) => void;
   renameParty: (partyId: string, name: string) => void;
   setPartyUnits: (
@@ -32,6 +35,7 @@ export function useBillSplit(initialSplit: BillSplit) {
 
   const actions = useMemo<BillSplitActions>(
     () => ({
+      setMode: (mode) => setSplit((current) => setSplitMode(current, mode)),
       setPartyCount: (count) => setSplit((current) => setPartyCount(current, count)),
       renameParty: (partyId, name) => setSplit((current) => renameParty(current, partyId, name)),
       setPartyUnits: (productKey, partyId, units, allocatable) =>

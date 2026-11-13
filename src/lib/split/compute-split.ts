@@ -5,6 +5,7 @@ import { sumBy } from "@/lib/math/sum-by";
 import { toGroupingKey, type ItemGroup } from "@/lib/receipt/group-items";
 import {
   getAllocation,
+  getSplitMode,
   type BillSplit,
   type ProductAllocation,
   type SplitParty,
@@ -87,7 +88,37 @@ function unassignedAmountOf(group: ItemGroup, allocation: ProductAllocation): nu
   return (remainingUnits(group, allocation) * group.totalAmount) / allocatableUnits(group);
 }
 
-/** Cuánto paga cada grupo: su consumo, más su parte de propina, menos su parte de descuento. */
+/** Una sola línea por grupo: su parte de los productos de toda la cuenta. */
+function equalShareLine(itemsSum: number, partyCount: number): PartyLine {
+  return { label: `Parte igual (1 de ${partyCount})`, amount: itemsSum / partyCount };
+}
+
+/** El consumo de un grupo, según el modo de división. */
+function partyLines(
+  groups: ItemGroup[],
+  split: BillSplit,
+  partyId: string,
+  itemsSum: number,
+): PartyLine[] {
+  if (getSplitMode(split) === "equal") return [equalShareLine(itemsSum, split.parties.length)];
+  return groups.flatMap(
+    (group) => partyLine(group, getAllocation(split, productKey(group)), partyId) ?? [],
+  );
+}
+
+/** En partes iguales no queda nada sin asignar; por producto, lo que falte en cada uno. */
+function unassignedAmountOfSplit(groups: ItemGroup[], split: BillSplit): number {
+  if (getSplitMode(split) === "equal") return 0;
+  return sumBy(groups, (group) =>
+    unassignedAmountOf(group, getAllocation(split, productKey(group))),
+  );
+}
+
+/**
+ * Cuánto paga cada grupo: su consumo, más su parte de impuestos y propina, menos su parte de
+ * descuento. Los cargos se reparten en proporción al consumo, así que en partes iguales también
+ * salen iguales.
+ */
 export function computeSplit(
   groups: ItemGroup[],
   split: BillSplit,
@@ -95,9 +126,7 @@ export function computeSplit(
   currency: string,
 ): SplitResult {
   const rawBills = split.parties.map((party) => {
-    const lines = groups.flatMap(
-      (group) => partyLine(group, getAllocation(split, productKey(group)), party.id) ?? [],
-    );
+    const lines = partyLines(groups, split, party.id, charges.itemsSum);
     const subtotal = sumBy(lines, (line) => line.amount);
     const share = charges.itemsSum > 0 ? subtotal / charges.itemsSum : 0;
     const discount = charges.discount * share;
@@ -123,8 +152,6 @@ export function computeSplit(
       tip: round(bill.tip),
       total: roundedTotals[index],
     })),
-    unassignedAmount: round(
-      sumBy(groups, (group) => unassignedAmountOf(group, getAllocation(split, productKey(group)))),
-    ),
+    unassignedAmount: round(unassignedAmountOfSplit(groups, split)),
   };
 }
